@@ -1,0 +1,47 @@
+import type { RouteObject } from 'react-router'
+import { Navigate } from 'react-router'
+import AdminLayout from '../layout/AdminLayout'
+import HomePage from '../pages/HomePage'
+import UserListPage from '../pages/user/UserList'
+import RoleListPage from '../pages/role/RoleList'
+import AccessListPage from '../pages/access/AccessList'
+
+const routes: RouteObject[] = [
+  {
+    path: '/',
+    element: <Navigate to='/admin' />,
+  },
+  {
+    path: '/admin',
+    element: <AdminLayout />,
+    children: [
+      {
+        index: true,
+        element: <HomePage />,
+      },
+      {
+        path: 'system',
+        children: [
+          {
+            index: true,
+            element: <Navigate to='/admin/system/users' />,
+          },
+          {
+            path: 'users',
+            element: <UserListPage />,
+          },
+          {
+            path: 'roles',
+            element: <RoleListPage />,
+          },
+          {
+            path: 'accesses',
+            element: <AccessListPage />,
+          },
+        ],
+      },
+    ],
+  },
+]
+
+export default routes
