@@ -3,7 +3,6 @@ import { Outlet } from 'react-router'
 import AppHeader from '../components/AppHeader/AppHeader'
 import AppSider from '../components/AppSider/AppSider'
 import { useState } from 'react'
-import AppLogo from '../components/AppHeader/AppLogo'
 const { Header, Content } = Layout
 
 const AdminLayout = () => {
@@ -18,23 +17,21 @@ const AdminLayout = () => {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Header
-        style={{
-          padding: 0,
-          background: colorBgContainer,
-          display: 'flex',
-        }}
-      >
-        <AppLogo collapsed={collapsed} />
-        <AppHeader toggleCollapsed={toggleCollapsed} collapsed={collapsed} />
-      </Header>
-
+      <AppSider collapsed={collapsed} />
       <Layout>
-        <AppSider collapsed={collapsed} />
+        <Header
+          style={{
+            padding: 0,
+            background: colorBgContainer,
+            display: 'flex',
+          }}
+        >
+          <AppHeader toggleCollapsed={toggleCollapsed} collapsed={collapsed} />
+        </Header>
         <Content
           style={{
-            margin: 24,
-            padding: 24,
+            margin: 12,
+            padding: 12,
             background: colorBgContainer,
             borderRadius: borderRadiusLG,
           }}

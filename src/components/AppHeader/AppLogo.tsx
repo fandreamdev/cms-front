@@ -6,9 +6,8 @@ const AppLogo = ({ collapsed }: AppLogoProps) => {
   return (
     <div
       style={{
-        width: collapsed ? 80 : 220,
         flexShrink: 0,
-        height: '100%',
+        height: 64,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
