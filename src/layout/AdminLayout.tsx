@@ -16,7 +16,7 @@ const AdminLayout = () => {
   }
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ height: '100vh' }}>
       <AppSider collapsed={collapsed} />
       <Layout>
         <Header
@@ -31,9 +31,11 @@ const AdminLayout = () => {
         <Content
           style={{
             margin: 12,
-            padding: 12,
-            background: colorBgContainer,
             borderRadius: borderRadiusLG,
+            overflow: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: 0,
           }}
         >
           <Outlet />

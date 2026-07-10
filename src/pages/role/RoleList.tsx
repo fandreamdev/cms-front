@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { Button, Card, Form, Table, message } from 'antd'
-import { PlusOutlined } from '@ant-design/icons'
+import { Card, Form, Table, message } from 'antd'
 import {
   createRole,
   deleteRole,
@@ -11,6 +10,7 @@ import {
   type RoleQuery,
 } from '../../api/role'
 import { usePagedList } from '../../hooks/usePagedList'
+import { useTableScrollY } from '../../hooks/useTableScrollY'
 import RoleFormModal from './RoleFormModal'
 import RoleSearchForm from './RoleSearchForm'
 import { createRoleColumns } from './roleColumns'
@@ -29,6 +29,8 @@ const RoleListPage = () => {
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Role | null>(null)
   const [submitting, setSubmitting] = useState(false)
+
+  const { ref: tableWrapRef, scrollY } = useTableScrollY()
 
   const handleSearch = () => {
     const values = searchForm.getFieldsValue()
@@ -81,32 +83,37 @@ const RoleListPage = () => {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1, minHeight: 0 }}>
       <Card>
-        <RoleSearchForm form={searchForm} onSearch={handleSearch} onReset={handleReset} />
+        <RoleSearchForm
+          form={searchForm}
+          onSearch={handleSearch}
+          onReset={handleReset}
+          onCreate={openCreate}
+        />
       </Card>
 
-      <Card>
-        <div style={{ marginBottom: 16 }}>
-          <Button type='primary' icon={<PlusOutlined />} onClick={openCreate}>
-            新增角色
-          </Button>
+      <Card
+        style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
+        styles={{ body: { flex: 1, minHeight: 0, overflow: 'hidden' } }}
+      >
+        <div ref={tableWrapRef} style={{ height: '100%' }}>
+          <Table<Role>
+            rowKey='id'
+            columns={createRoleColumns({ onEdit: openEdit, onDelete: handleDelete })}
+            dataSource={data}
+            loading={loading}
+            scroll={{ x: 'max-content', y: scrollY }}
+            pagination={{
+              current: query.page,
+              pageSize: query.pageSize,
+              total,
+              showSizeChanger: true,
+              showTotal: (value) => `共 ${value} 条`,
+              onChange: (page, pageSize) => setQuery((prev) => ({ ...prev, page, pageSize })),
+            }}
+          />
         </div>
-        <Table<Role>
-          rowKey='id'
-          columns={createRoleColumns({ onEdit: openEdit, onDelete: handleDelete })}
-          dataSource={data}
-          loading={loading}
-          scroll={{ x: 'max-content' }}
-          pagination={{
-            current: query.page,
-            pageSize: query.pageSize,
-            total,
-            showSizeChanger: true,
-            showTotal: (value) => `共 ${value} 条`,
-            onChange: (page, pageSize) => setQuery((prev) => ({ ...prev, page, pageSize })),
-          }}
-        />
       </Card>
 
       <RoleFormModal

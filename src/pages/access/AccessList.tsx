@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Button, Card, Form, Table, message } from 'antd'
-import { PlusOutlined } from '@ant-design/icons'
+import { Card, Form, Table, message } from 'antd'
 import {
   createAccess,
   deleteAccess,
@@ -10,6 +9,7 @@ import {
   type AccessQuery,
   type AccessTree,
 } from '../../api/access'
+import { useTableScrollY } from '../../hooks/useTableScrollY'
 import AccessFormModal from './AccessFormModal'
 import AccessSearchForm from './AccessSearchForm'
 import { createAccessColumns } from './accessColumns'
@@ -35,6 +35,8 @@ const AccessListPage = () => {
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Access | null>(null)
   const [submitting, setSubmitting] = useState(false)
+
+  const { ref: tableWrapRef, scrollY } = useTableScrollY()
 
   const flatData = useMemo(() => flattenAccessTree(tree), [tree])
   const filteredTree = useMemo(() => filterAccessTree(tree, query), [tree, query])
@@ -116,28 +118,33 @@ const AccessListPage = () => {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1, minHeight: 0 }}>
       <Card>
-        <AccessSearchForm form={searchForm} onSearch={handleSearch} onReset={handleReset} />
+        <AccessSearchForm
+          form={searchForm}
+          onSearch={handleSearch}
+          onReset={handleReset}
+          onCreate={openCreate}
+        />
       </Card>
 
-      <Card>
-        <div style={{ marginBottom: 16 }}>
-          <Button type='primary' icon={<PlusOutlined />} onClick={openCreate}>
-            新增资源
-          </Button>
+      <Card
+        style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
+        styles={{ body: { flex: 1, minHeight: 0, overflow: 'hidden' } }}
+      >
+        <div ref={tableWrapRef} style={{ height: '100%' }}>
+          <Table<AccessTreeNode>
+            rowKey='id'
+            columns={createAccessColumns({ onEdit: openEdit, onDelete: handleDelete })}
+            dataSource={treeData}
+            loading={loading}
+            pagination={false}
+            scroll={{ x: 'max-content', y: scrollY }}
+            expandable={{ defaultExpandAllRows: true }}
+            footer={() => `共 ${total} 条`}
+            indentSize={12}
+          />
         </div>
-        <Table<AccessTreeNode>
-          rowKey='id'
-          columns={createAccessColumns({ onEdit: openEdit, onDelete: handleDelete })}
-          dataSource={treeData}
-          loading={loading}
-          pagination={false}
-          scroll={{ x: 'max-content' }}
-          expandable={{ defaultExpandAllRows: true }}
-          footer={() => `共 ${total} 条`}
-          indentSize={12}
-        />
       </Card>
 
       <AccessFormModal
