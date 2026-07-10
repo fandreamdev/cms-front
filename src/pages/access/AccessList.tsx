@@ -128,10 +128,7 @@ const AccessListPage = () => {
         />
       </Card>
 
-      <Card
-        style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
-        styles={{ body: { flex: 1, minHeight: 0, overflow: 'hidden' } }}
-      >
+      <Card style={{ flex: 1, minHeight: 0 }} styles={{ body: { height: '100%' } }}>
         <div ref={tableWrapRef} style={{ height: '100%' }}>
           <Table<AccessTreeNode>
             rowKey='id'
