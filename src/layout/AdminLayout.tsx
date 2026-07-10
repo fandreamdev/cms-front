@@ -33,9 +33,6 @@ const AdminLayout = () => {
             margin: 12,
             borderRadius: borderRadiusLG,
             overflow: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            minHeight: 0,
           }}
         >
           <Outlet />

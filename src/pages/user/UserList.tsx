@@ -91,7 +91,7 @@ const UserListPage = () => {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, flex: 1, minHeight: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, height: '100%' }}>
       <Card>
         <UserSearchForm
           form={searchForm}
@@ -101,10 +101,7 @@ const UserListPage = () => {
         />
       </Card>
 
-      <Card
-        style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
-        styles={{ body: { flex: 1, minHeight: 0, overflow: 'hidden' } }}
-      >
+      <Card style={{ flex: 1, minHeight: 0 }} styles={{ body: { height: '100%' } }}>
         <div ref={tableWrapRef} style={{ height: '100%' }}>
           <Table<User>
             rowKey='id'

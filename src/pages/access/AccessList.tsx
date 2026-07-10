@@ -118,7 +118,7 @@ const AccessListPage = () => {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1, minHeight: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, height: '100%' }}>
       <Card>
         <AccessSearchForm
           form={searchForm}
