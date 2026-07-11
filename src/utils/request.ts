@@ -30,15 +30,16 @@ function buildQuery(params?: Record<string, unknown>): string {
 
 async function request<T>(url: string, options: RequestOptions = {}): Promise<T> {
   const { params, body, headers, ...rest } = options
+  const isFormData = body instanceof FormData
 
   let res: Response
   try {
     res = await fetch(`${BASE_URL}${url}${buildQuery(params)}`, {
       headers: {
-        'Content-Type': 'application/json',
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
         ...headers,
       },
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: body === undefined ? undefined : isFormData ? body : JSON.stringify(body),
       ...rest,
     })
   } catch {
@@ -47,7 +48,14 @@ async function request<T>(url: string, options: RequestOptions = {}): Promise<T>
   }
 
   if (!res.ok) {
-    message.error(`请求失败：${res.status}`)
+    let errorMessage = `请求失败：${res.status}`
+    try {
+      const error = (await res.json()) as Partial<ApiResponse<unknown>>
+      if (error.message) errorMessage = error.message
+    } catch {
+      // 非 JSON 错误响应使用 HTTP 状态提示
+    }
+    message.error(errorMessage)
     throw new Error(`HTTP ${res.status}`)
   }
 
