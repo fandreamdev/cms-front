@@ -10,8 +10,15 @@ interface AppSiderProps {
 const AppSider = ({ collapsed }: AppSiderProps) => {
   const navigate = useNavigate()
   const { pathname } = useLocation()
+  const selectedPath = pathname.startsWith('/admin/content/articles/')
+    ? '/admin/content/articles'
+    : pathname
 
-  // 展开所有以当前路径为前缀的父级菜单
+  const defaultOpenKeys = pathname
+    .split('/')
+    .slice(1, -1)
+    .map((_, index, segments) => `/${segments.slice(0, index + 1).join('/')}`)
+
   return (
     <Layout.Sider theme='dark' collapsed={collapsed}>
       <AppLogo collapsed={collapsed} />
@@ -19,7 +26,8 @@ const AppSider = ({ collapsed }: AppSiderProps) => {
         mode='inline'
         theme='dark'
         items={menuItems}
-        selectedKeys={[pathname]}
+        selectedKeys={[selectedPath]}
+        defaultOpenKeys={defaultOpenKeys}
         onClick={({ key }) => navigate(key)}
       />
     </Layout.Sider>

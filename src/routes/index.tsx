@@ -5,6 +5,11 @@ import HomePage from '../pages/HomePage'
 import UserListPage from '../pages/user/UserList'
 import RoleListPage from '../pages/role/RoleList'
 import AccessListPage from '../pages/access/AccessList'
+import ArticleListPage from '../pages/article/ArticleList'
+import TagListPage from '../pages/tag/TagList'
+import CategoryListPage from '../pages/category/CategoryList'
+import ArticleEditorPage from '../pages/article/ArticleEditor'
+import ArticleDetailPage from '../pages/article/ArticleDetail'
 
 const routes: RouteObject[] = [
   {
@@ -18,6 +23,18 @@ const routes: RouteObject[] = [
       {
         index: true,
         element: <HomePage />,
+      },
+      {
+        path: 'content',
+        children: [
+          { index: true, element: <Navigate to='/admin/content/articles' /> },
+          { path: 'articles', element: <ArticleListPage /> },
+          { path: 'articles/new', element: <ArticleEditorPage /> },
+          { path: 'articles/:id/edit', element: <ArticleEditorPage /> },
+          { path: 'articles/:id', element: <ArticleDetailPage /> },
+          { path: 'categories', element: <CategoryListPage /> },
+          { path: 'tags', element: <TagListPage /> },
+        ],
       },
       {
         path: 'system',

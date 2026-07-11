@@ -1,5 +1,11 @@
 import type { MenuProps } from 'antd'
-import { HomeOutlined, SettingOutlined } from '@ant-design/icons'
+import {
+  FileTextOutlined,
+  FolderOutlined,
+  HomeOutlined,
+  SettingOutlined,
+  TagsOutlined,
+} from '@ant-design/icons'
 
 export type MenuItem = Required<MenuProps>['items'][number]
 
@@ -10,6 +16,7 @@ export const menuItems: MenuItem[] = [
     icon: <HomeOutlined />,
     label: '首页',
   },
+
   {
     key: '/admin/system',
     icon: <SettingOutlined />,
@@ -27,6 +34,16 @@ export const menuItems: MenuItem[] = [
         key: '/admin/system/accesses',
         label: '资源列表',
       },
+    ],
+  },
+  {
+    key: '/admin/content',
+    icon: <FileTextOutlined />,
+    label: '内容管理',
+    children: [
+      { key: '/admin/content/articles', label: '文章管理', icon: <FileTextOutlined /> },
+      { key: '/admin/content/categories', label: '分类管理', icon: <FolderOutlined /> },
+      { key: '/admin/content/tags', label: '标签管理', icon: <TagsOutlined /> },
     ],
   },
 ]
