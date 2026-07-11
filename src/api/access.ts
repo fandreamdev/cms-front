@@ -33,6 +33,10 @@ export function getAccessTree() {
   return request<AccessTree[]>('/accesses/tree')
 }
 
+export function getAccess(id: number) {
+  return request<Access>(`/accesses/${id}`)
+}
+
 export function createAccess(data: AccessPayload) {
   return request<Access>('/accesses', { method: 'POST', body: data })
 }

@@ -5,11 +5,13 @@ import { typeColorMap, typeLabelMap } from './constants'
 import type { AccessTreeNode } from './types'
 
 interface AccessColumnsOptions {
+  onView: (id: number) => void
   onEdit: (record: AccessTreeNode) => void
   onDelete: (id: number) => void
 }
 
 export function createAccessColumns({
+  onView,
   onEdit,
   onDelete,
 }: AccessColumnsOptions): ColumnsType<AccessTreeNode> {
@@ -41,10 +43,13 @@ export function createAccessColumns({
     {
       title: '操作',
       key: 'action',
-      width: 150,
+      width: 200,
       fixed: 'right',
       render: (_, record) => (
         <Space>
+          <Button type='link' size='small' onClick={() => onView(record.id)}>
+            查看
+          </Button>
           <Button type='link' size='small' onClick={() => onEdit(record)}>
             编辑
           </Button>

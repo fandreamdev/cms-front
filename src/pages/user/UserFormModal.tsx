@@ -3,16 +3,32 @@ import type { FormInstance } from 'antd'
 import type { User, UserPayload } from '../../api/user'
 import { statusOptions, superOptions } from './constants'
 
+interface RoleOption {
+  label: string
+  value: number
+}
+
 interface UserFormModalProps {
   form: FormInstance<UserPayload>
   open: boolean
   editing: User | null
   submitting: boolean
+  roleLoading: boolean
+  roleOptions: RoleOption[]
   onOk: () => void
   onCancel: () => void
 }
 
-const UserFormModal = ({ form, open, editing, submitting, onOk, onCancel }: UserFormModalProps) => (
+const UserFormModal = ({
+  form,
+  open,
+  editing,
+  submitting,
+  roleLoading,
+  roleOptions,
+  onOk,
+  onCancel,
+}: UserFormModalProps) => (
   <Modal
     title={editing ? '编辑用户' : '新增用户'}
     open={open}
@@ -57,6 +73,16 @@ const UserFormModal = ({ form, open, editing, submitting, onOk, onCancel }: User
       </Form.Item>
       <Form.Item name='sort' label='排序' rules={[{ required: true }]}>
         <Input type='number' placeholder='数值越大越靠前' />
+      </Form.Item>
+      <Form.Item name='roleIds' label='角色'>
+        <Select
+          mode='multiple'
+          allowClear
+          loading={roleLoading}
+          options={roleOptions}
+          placeholder='请选择角色'
+          optionFilterProp='label'
+        />
       </Form.Item>
     </Form>
   </Modal>

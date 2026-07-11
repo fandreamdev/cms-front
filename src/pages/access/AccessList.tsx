@@ -3,6 +3,7 @@ import { Card, Form, Table, message } from 'antd'
 import {
   createAccess,
   deleteAccess,
+  getAccess,
   getAccessTree,
   updateAccess,
   type Access,
@@ -10,10 +11,12 @@ import {
   type AccessTree,
 } from '../../api/access'
 import { useTableScrollY } from '../../hooks/useTableScrollY'
+import DetailModal from '../../components/DetailModal'
 import AccessFormModal from './AccessFormModal'
 import AccessSearchForm from './AccessSearchForm'
 import { createAccessColumns } from './accessColumns'
 import { ROOT_PARENT_VALUE } from './constants'
+import { typeLabelMap } from './constants'
 import {
   addDisplayNo,
   buildParentOptions,
@@ -35,6 +38,9 @@ const AccessListPage = () => {
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Access | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [detailOpen, setDetailOpen] = useState(false)
+  const [detailLoading, setDetailLoading] = useState(false)
+  const [detail, setDetail] = useState<Access | null>(null)
 
   const { ref: tableWrapRef, scrollY } = useTableScrollY()
 
@@ -93,6 +99,19 @@ const AccessListPage = () => {
     setModalOpen(true)
   }
 
+  const openDetail = async (id: number) => {
+    setDetail(null)
+    setDetailOpen(true)
+    setDetailLoading(true)
+    try {
+      setDetail(await getAccess(id))
+    } catch {
+      setDetailOpen(false)
+    } finally {
+      setDetailLoading(false)
+    }
+  }
+
   const handleSubmit = async () => {
     const values = await modalForm.validateFields()
     setSubmitting(true)
@@ -132,7 +151,7 @@ const AccessListPage = () => {
         <div ref={tableWrapRef} style={{ height: '100%' }}>
           <Table<AccessTreeNode>
             rowKey='id'
-            columns={createAccessColumns({ onEdit: openEdit, onDelete: handleDelete })}
+            columns={createAccessColumns({ onView: openDetail, onEdit: openEdit, onDelete: handleDelete })}
             dataSource={treeData}
             loading={loading}
             pagination={false}
@@ -154,6 +173,26 @@ const AccessListPage = () => {
         parentOptions={parentOptions}
         onOk={handleSubmit}
         onCancel={() => setModalOpen(false)}
+      />
+      <DetailModal
+        title='资源详情'
+        open={detailOpen}
+        loading={detailLoading}
+        onCancel={() => setDetailOpen(false)}
+        items={detail ? [
+          { label: 'ID', children: detail.id },
+          { label: '资源名称', children: detail.description },
+          { label: '类型', children: typeLabelMap[detail.type] },
+          { label: '资源标识', children: detail.url },
+          {
+            label: '上级资源名称',
+            children: detail.parentId === null
+              ? '-'
+              : flatData.find((item) => item.id === detail.parentId)?.description ?? '-',
+          },
+          { label: '创建时间', children: new Date(detail.createdAt).toLocaleString() },
+          { label: '更新时间', children: new Date(detail.updatedAt).toLocaleString() },
+        ] : []}
       />
     </div>
   )

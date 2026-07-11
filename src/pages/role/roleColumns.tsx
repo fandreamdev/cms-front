@@ -3,11 +3,12 @@ import type { ColumnsType } from 'antd/es/table'
 import type { Role } from '../../api/role'
 
 interface RoleColumnsOptions {
+  onView: (id: number) => void
   onEdit: (record: Role) => void
   onDelete: (id: number) => void
 }
 
-export function createRoleColumns({ onEdit, onDelete }: RoleColumnsOptions): ColumnsType<Role> {
+export function createRoleColumns({ onView, onEdit, onDelete }: RoleColumnsOptions): ColumnsType<Role> {
   return [
     { title: 'ID', dataIndex: 'id', width: 70 },
     { title: '角色名称', dataIndex: 'name' },
@@ -26,10 +27,13 @@ export function createRoleColumns({ onEdit, onDelete }: RoleColumnsOptions): Col
     {
       title: '操作',
       key: 'action',
-      width: 150,
+      width: 200,
       fixed: 'right',
       render: (_, record) => (
         <Space>
+          <Button type='link' size='small' onClick={() => onView(record.id)}>
+            查看
+          </Button>
           <Button type='link' size='small' onClick={() => onEdit(record)}>
             编辑
           </Button>

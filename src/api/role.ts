@@ -1,8 +1,18 @@
 import request from '../utils/request'
+import type { AccessType } from './access'
+import type { PagedResult } from './types'
+
+export interface RoleAccess {
+  id: number
+  type: AccessType
+  url: string
+  description: string
+}
 
 export interface Role {
   id: number
   name: string
+  accesses?: RoleAccess[]
   createdAt: string
   updatedAt: string
 }
@@ -13,22 +23,19 @@ export interface RoleQuery {
   pageSize?: number
 }
 
-export interface RoleListResult {
-  list: Role[]
-  total: number
-  page: number
-  pageSize: number
-  totalPages: number
-}
-
 export interface RolePayload {
   name: string
+  accessIds?: number[]
 }
 
 export function getRoleList(params: RoleQuery) {
-  return request<RoleListResult>('/roles', {
+  return request<PagedResult<Role>>('/roles', {
     params: params as Record<string, unknown>,
   })
+}
+
+export function getRole(id: number) {
+  return request<Role>(`/roles/${id}`)
 }
 
 export function createRole(data: RolePayload) {
