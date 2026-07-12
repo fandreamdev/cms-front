@@ -7,6 +7,9 @@ import { getArticle, type Article } from '../../api/article'
 import { renderContent } from '../../utils/content'
 import { approvalStatusMap } from './approval'
 import { queryKeys } from '../../app/queryKeys'
+import { useAuth } from '../../contexts/authContextValue'
+import { hasPermission } from '../../api/auth'
+import { BUTTON_PERMISSIONS } from '../../config/permissions'
 
 interface ArticleDetailPageProps {
   reviewMode?: boolean
@@ -16,6 +19,7 @@ const ArticleDetailPage = ({ reviewMode = false }: ArticleDetailPageProps) => {
   const { id } = useParams({ strict: false }) as { id?: string }
   const articleId = Number(id)
   const navigate = useNavigate()
+  const { user } = useAuth()
   const {
     data: article,
     isFetching: loading,
@@ -54,7 +58,7 @@ const ArticleDetailPage = ({ reviewMode = false }: ArticleDetailPageProps) => {
             >
               返回列表
             </Button>
-            {!reviewMode && article && (
+            {!reviewMode && article && hasPermission(user, BUTTON_PERMISSIONS.article.edit) && (
               <Button
                 type="primary"
                 icon={<EditOutlined />}

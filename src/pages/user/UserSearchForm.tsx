@@ -8,7 +8,7 @@ interface UserSearchFormProps {
   form: FormInstance<UserQuery>
   onSearch: () => void
   onReset: () => void
-  onCreate: () => void
+  onCreate?: () => void
 }
 
 const UserSearchForm = ({ form, onSearch, onReset, onCreate }: UserSearchFormProps) => (
@@ -32,9 +32,11 @@ const UserSearchForm = ({ form, onSearch, onReset, onCreate }: UserSearchFormPro
     </Flex>
     <Form.Item style={{ marginBottom: 0 }}>
       <Space size={'large'}>
-        <Button type="primary" icon={<PlusOutlined />} onClick={onCreate}>
-          新增用户
-        </Button>
+        {onCreate && (
+          <Button type="primary" icon={<PlusOutlined />} onClick={onCreate}>
+            新增用户
+          </Button>
+        )}
         <Button type="primary" htmlType="submit">
           查询
         </Button>

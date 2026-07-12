@@ -10,7 +10,7 @@ interface Props {
   form: FormInstance<CategorySearchValues>
   onSearch: () => void
   onReset: () => void
-  onCreate: () => void
+  onCreate?: () => void
 }
 
 const CategorySearchForm = ({ form, onSearch, onReset, onCreate }: Props) => (
@@ -25,9 +25,11 @@ const CategorySearchForm = ({ form, onSearch, onReset, onCreate }: Props) => (
     </Flex>
     <Form.Item style={{ marginBottom: 0 }}>
       <Space>
-        <Button type="primary" icon={<PlusOutlined />} onClick={onCreate}>
-          新增分类
-        </Button>
+        {onCreate && (
+          <Button type="primary" icon={<PlusOutlined />} onClick={onCreate}>
+            新增分类
+          </Button>
+        )}
         <Button type="primary" htmlType="submit">
           查询
         </Button>

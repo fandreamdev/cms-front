@@ -6,12 +6,18 @@ interface RoleColumnsOptions {
   onView: (id: number) => void
   onEdit: (record: Role) => void
   onDelete: (id: number) => void
+  canView: boolean
+  canEdit: boolean
+  canDelete: boolean
 }
 
 export function createRoleColumns({
   onView,
   onEdit,
   onDelete,
+  canView,
+  canEdit,
+  canDelete,
 }: RoleColumnsOptions): ColumnsType<Role> {
   return [
     { title: 'ID', dataIndex: 'id', width: 70 },
@@ -35,22 +41,28 @@ export function createRoleColumns({
       fixed: 'right',
       render: (_, record) => (
         <Space>
-          <Button type="link" size="small" onClick={() => onView(record.id)}>
-            查看
-          </Button>
-          <Button type="link" size="small" onClick={() => onEdit(record)}>
-            编辑
-          </Button>
-          <Popconfirm
-            title="确定删除该角色吗？"
-            onConfirm={() => onDelete(record.id)}
-            okText="确定"
-            cancelText="取消"
-          >
-            <Button type="link" size="small" danger>
-              删除
+          {canView && (
+            <Button type="link" size="small" onClick={() => onView(record.id)}>
+              查看
             </Button>
-          </Popconfirm>
+          )}
+          {canEdit && (
+            <Button type="link" size="small" onClick={() => onEdit(record)}>
+              编辑
+            </Button>
+          )}
+          {canDelete && (
+            <Popconfirm
+              title="确定删除该角色吗？"
+              onConfirm={() => onDelete(record.id)}
+              okText="确定"
+              cancelText="取消"
+            >
+              <Button type="link" size="small" danger>
+                删除
+              </Button>
+            </Popconfirm>
+          )}
         </Space>
       ),
     },

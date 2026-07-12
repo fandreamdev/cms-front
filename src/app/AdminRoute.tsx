@@ -1,9 +1,12 @@
 import RequireAuth from '../components/RequireAuth'
 import AdminLayout from '../layout/AdminLayout'
+import PermissionRoute from '../components/PermissionRoute'
 
 const AdminRoute = () => (
   <RequireAuth>
-    <AdminLayout />
+    <PermissionRoute>
+      <AdminLayout />
+    </PermissionRoute>
   </RequireAuth>
 )
 

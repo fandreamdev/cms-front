@@ -7,7 +7,7 @@ interface RoleSearchFormProps {
   form: FormInstance<RoleQuery>
   onSearch: () => void
   onReset: () => void
-  onCreate: () => void
+  onCreate?: () => void
 }
 
 const RoleSearchForm = ({ form, onSearch, onReset, onCreate }: RoleSearchFormProps) => (
@@ -19,9 +19,11 @@ const RoleSearchForm = ({ form, onSearch, onReset, onCreate }: RoleSearchFormPro
     </Flex>
     <Form.Item style={{ marginBottom: 0 }}>
       <Space>
-        <Button type="primary" icon={<PlusOutlined />} onClick={onCreate}>
-          新增角色
-        </Button>
+        {onCreate && (
+          <Button type="primary" icon={<PlusOutlined />} onClick={onCreate}>
+            新增角色
+          </Button>
+        )}
         <Button type="primary" htmlType="submit">
           查询
         </Button>

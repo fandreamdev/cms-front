@@ -8,7 +8,7 @@ interface AccessSearchFormProps {
   form: FormInstance<AccessQuery>
   onSearch: () => void
   onReset: () => void
-  onCreate: () => void
+  onCreate?: () => void
 }
 
 const AccessSearchForm = ({ form, onSearch, onReset, onCreate }: AccessSearchFormProps) => (
@@ -27,9 +27,11 @@ const AccessSearchForm = ({ form, onSearch, onReset, onCreate }: AccessSearchFor
 
     <Form.Item style={{ marginBottom: 0 }}>
       <Space size={'medium'}>
-        <Button type="primary" icon={<PlusOutlined />} onClick={onCreate}>
-          新增资源
-        </Button>
+        {onCreate && (
+          <Button type="primary" icon={<PlusOutlined />} onClick={onCreate}>
+            新增资源
+          </Button>
+        )}
         <Button type="primary" htmlType="submit">
           查询
         </Button>

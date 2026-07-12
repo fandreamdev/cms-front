@@ -7,7 +7,7 @@ interface Props {
   form: FormInstance<TagQuery>
   onSearch: () => void
   onReset: () => void
-  onCreate: () => void
+  onCreate?: () => void
 }
 
 const TagSearchForm = ({ form, onSearch, onReset, onCreate }: Props) => (
@@ -22,9 +22,11 @@ const TagSearchForm = ({ form, onSearch, onReset, onCreate }: Props) => (
     </Flex>
     <Form.Item style={{ marginBottom: 0 }}>
       <Space>
-        <Button type="primary" icon={<PlusOutlined />} onClick={onCreate}>
-          新增标签
-        </Button>
+        {onCreate && (
+          <Button type="primary" icon={<PlusOutlined />} onClick={onCreate}>
+            新增标签
+          </Button>
+        )}
         <Button type="primary" htmlType="submit">
           查询
         </Button>

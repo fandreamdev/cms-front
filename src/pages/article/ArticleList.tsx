@@ -22,6 +22,7 @@ import { hasPermission } from '../../api/auth'
 import { useAuth } from '../../contexts/authContextValue'
 import { HttpError } from '../../utils/request'
 import { queryKeys } from '../../app/queryKeys'
+import { BUTTON_PERMISSIONS } from '../../config/permissions'
 
 const articleInitialQuery: ArticleQuery = { page: 1, pageSize: 10 }
 const reviewInitialQuery: ArticleQuery = { page: 1, pageSize: 10, approvalStatus: 'pending' }
@@ -106,11 +107,11 @@ const ArticleListPage = ({ reviewMode = false }: ArticleListPageProps) => {
     const isAuthor = record.authorId === user?.id
     const editable = isAuthor && ['draft', 'approved', 'rejected'].includes(record.approvalStatus)
     const pending = record.approvalStatus === 'pending'
-    const canApprove = hasPermission(user, 'article:approve')
-    const canChangeStatus = hasPermission(user, 'article:status')
+    const canApprove = hasPermission(user, BUTTON_PERMISSIONS.article.approve)
+    const canChangeStatus = hasPermission(user, BUTTON_PERMISSIONS.article.status)
     return (
       <Space>
-        {!reviewMode && editable && (
+        {!reviewMode && editable && hasPermission(user, BUTTON_PERMISSIONS.article.edit) && (
           <Button
             type="link"
             size="small"
@@ -124,7 +125,7 @@ const ArticleListPage = ({ reviewMode = false }: ArticleListPageProps) => {
             编辑
           </Button>
         )}
-        {!reviewMode && editable && (
+        {!reviewMode && editable && hasPermission(user, BUTTON_PERMISSIONS.article.submit) && (
           <Popconfirm
             title="提交后文章将进入审批中，审批完成或撤回前不能继续编辑。"
             onConfirm={() => runAction(() => submitArticle(record.id), '提交审批成功')}
@@ -136,18 +137,21 @@ const ArticleListPage = ({ reviewMode = false }: ArticleListPageProps) => {
             </Button>
           </Popconfirm>
         )}
-        {!reviewMode && isAuthor && pending && (
-          <Popconfirm
-            title="撤回后文章将不能继续编辑或重新提交，是否继续？"
-            onConfirm={() => runAction(() => withdrawArticle(record.id), '撤回成功')}
-            okText="撤回"
-            cancelText="取消"
-          >
-            <Button type="link" size="small" danger>
-              撤回
-            </Button>
-          </Popconfirm>
-        )}
+        {!reviewMode &&
+          isAuthor &&
+          pending &&
+          hasPermission(user, BUTTON_PERMISSIONS.article.withdraw) && (
+            <Popconfirm
+              title="撤回后文章将不能继续编辑或重新提交，是否继续？"
+              onConfirm={() => runAction(() => withdrawArticle(record.id), '撤回成功')}
+              okText="撤回"
+              cancelText="取消"
+            >
+              <Button type="link" size="small" danger>
+                撤回
+              </Button>
+            </Popconfirm>
+          )}
         {reviewMode && pending && canApprove && (
           <Popconfirm
             title="确定审核通过该文章吗？"
@@ -179,18 +183,21 @@ const ArticleListPage = ({ reviewMode = false }: ArticleListPageProps) => {
             {record.status === 1 ? '下架' : '上架'}
           </Button>
         )}
-        {!reviewMode && isAuthor && ['draft', 'rejected'].includes(record.approvalStatus) && (
-          <Popconfirm
-            title="确定删除该文章吗？"
-            onConfirm={() => handleDelete(record.id)}
-            okText="确定"
-            cancelText="取消"
-          >
-            <Button type="link" size="small" danger>
-              删除
-            </Button>
-          </Popconfirm>
-        )}
+        {!reviewMode &&
+          isAuthor &&
+          hasPermission(user, BUTTON_PERMISSIONS.article.delete) &&
+          ['draft', 'rejected'].includes(record.approvalStatus) && (
+            <Popconfirm
+              title="确定删除该文章吗？"
+              onConfirm={() => handleDelete(record.id)}
+              okText="确定"
+              cancelText="取消"
+            >
+              <Button type="link" size="small" danger>
+                删除
+              </Button>
+            </Popconfirm>
+          )}
       </Space>
     )
   }
@@ -214,7 +221,11 @@ const ArticleListPage = ({ reviewMode = false }: ArticleListPageProps) => {
             searchForm.resetFields()
             setQuery(initialQuery)
           }}
-          onCreate={reviewMode ? undefined : () => navigate({ to: '/admin/content/articles/new' })}
+          onCreate={
+            !reviewMode && hasPermission(user, BUTTON_PERMISSIONS.article.create)
+              ? () => navigate({ to: '/admin/content/articles/new' })
+              : undefined
+          }
         />
       </Card>
       <Card style={{ flex: 1, minHeight: 0 }} styles={{ body: { height: '100%' } }}>
@@ -228,6 +239,7 @@ const ArticleListPage = ({ reviewMode = false }: ArticleListPageProps) => {
                   ? navigate({ to: '/admin/reviews/articles/$id', params: { id: String(id) } })
                   : navigate({ to: '/admin/content/articles/$id', params: { id: String(id) } }),
               renderActions,
+              canView: hasPermission(user, BUTTON_PERMISSIONS.article.view),
             })}
             dataSource={data}
             loading={loading}

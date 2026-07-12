@@ -21,6 +21,8 @@ import { getAccessTree, type AccessTree } from '../../api/access'
 import { typeLabelMap } from '../access/constants'
 import { queryKeys } from '../../app/queryKeys'
 import { useQueryClient } from '@tanstack/react-query'
+import { usePermission } from '../../shared/hooks/usePermission'
+import { BUTTON_PERMISSIONS } from '../../config/permissions'
 
 const initialQuery: RoleQuery = { page: 1, pageSize: 10 }
 
@@ -35,6 +37,7 @@ const toAccessTreeData = (nodes: AccessTree[]): TreeSelectProps['treeData'] =>
 const RoleListPage = () => {
   const [searchForm] = Form.useForm<RoleQuery>()
   const queryClient = useQueryClient()
+  const can = usePermission()
   const [modalForm] = Form.useForm<RolePayload>()
 
   const { data, total, loading, query, setQuery } = usePagedQuery(
@@ -162,7 +165,7 @@ const RoleListPage = () => {
           form={searchForm}
           onSearch={handleSearch}
           onReset={handleReset}
-          onCreate={openCreate}
+          onCreate={can(BUTTON_PERMISSIONS.role.create) ? openCreate : undefined}
         />
       </Card>
 
@@ -174,6 +177,9 @@ const RoleListPage = () => {
               onView: openDetail,
               onEdit: openEdit,
               onDelete: handleDelete,
+              canView: can(BUTTON_PERMISSIONS.role.view),
+              canEdit: can(BUTTON_PERMISSIONS.role.edit),
+              canDelete: can(BUTTON_PERMISSIONS.role.delete),
             })}
             dataSource={data}
             loading={loading}

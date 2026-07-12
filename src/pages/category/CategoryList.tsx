@@ -17,6 +17,8 @@ import CategoryFormModal from './CategoryFormModal'
 import CategorySearchForm, { type CategorySearchValues } from './CategorySearchForm'
 import { createCategoryColumns } from './categoryColumns'
 import { queryKeys } from '../../app/queryKeys'
+import { usePermission } from '../../shared/hooks/usePermission'
+import { BUTTON_PERMISSIONS } from '../../config/permissions'
 
 const ROOT_ID = 0
 const flatten = (nodes: Category[]): Category[] =>
@@ -27,6 +29,7 @@ const descendantIds = (record: Category) =>
 const CategoryListPage = () => {
   const [searchForm] = Form.useForm<CategorySearchValues>()
   const queryClient = useQueryClient()
+  const can = usePermission()
   const [modalForm] = Form.useForm<CategoryPayload & { parentId: number }>()
   const [query, setQuery] = useState<CategorySearchValues>({})
   const { data: tree = [], isFetching: loading } = useQuery({
@@ -136,7 +139,7 @@ const CategoryListPage = () => {
             searchForm.resetFields()
             setQuery({})
           }}
-          onCreate={() => openCreate()}
+          onCreate={can(BUTTON_PERMISSIONS.category.create) ? () => openCreate() : undefined}
         />
       </Card>
       <Card style={{ flex: 1, minHeight: 0 }} styles={{ body: { height: '100%' } }}>
@@ -148,6 +151,10 @@ const CategoryListPage = () => {
               onCreateChild: (record) => openCreate(record.id),
               onEdit: openEdit,
               onDelete: handleDelete,
+              canView: can(BUTTON_PERMISSIONS.category.view),
+              canCreate: can(BUTTON_PERMISSIONS.category.create),
+              canEdit: can(BUTTON_PERMISSIONS.category.edit),
+              canDelete: can(BUTTON_PERMISSIONS.category.delete),
             })}
             dataSource={filteredTree}
             loading={loading}

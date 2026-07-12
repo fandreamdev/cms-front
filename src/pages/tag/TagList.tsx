@@ -18,12 +18,15 @@ import TagSearchForm from './TagSearchForm'
 import { createTagColumns } from './tagColumns'
 import { queryKeys } from '../../app/queryKeys'
 import { useQueryClient } from '@tanstack/react-query'
+import { usePermission } from '../../shared/hooks/usePermission'
+import { BUTTON_PERMISSIONS } from '../../config/permissions'
 
 const initialQuery: TagQuery = { page: 1, pageSize: 10 }
 
 const TagListPage = () => {
   const [searchForm] = Form.useForm<TagQuery>()
   const queryClient = useQueryClient()
+  const can = usePermission()
   const [modalForm] = Form.useForm<TagPayload>()
   const { data, total, loading, query, setQuery } = usePagedQuery(
     initialQuery,
@@ -114,7 +117,7 @@ const TagListPage = () => {
             searchForm.resetFields()
             setQuery(initialQuery)
           }}
-          onCreate={openCreate}
+          onCreate={can(BUTTON_PERMISSIONS.tag.create) ? openCreate : undefined}
         />
       </Card>
       <Card style={{ flex: 1, minHeight: 0 }} styles={{ body: { height: '100%' } }}>
@@ -126,6 +129,9 @@ const TagListPage = () => {
               onView: openDetail,
               onEdit: openEdit,
               onDelete: handleDelete,
+              canView: can(BUTTON_PERMISSIONS.tag.view),
+              canEdit: can(BUTTON_PERMISSIONS.tag.edit),
+              canDelete: can(BUTTON_PERMISSIONS.tag.delete),
             })}
             dataSource={data}
             loading={loading}

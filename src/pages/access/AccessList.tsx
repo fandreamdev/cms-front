@@ -26,10 +26,13 @@ import {
 } from './treeUtils'
 import type { AccessFormValues, AccessTreeNode } from './types'
 import { queryKeys } from '../../app/queryKeys'
+import { usePermission } from '../../shared/hooks/usePermission'
+import { BUTTON_PERMISSIONS } from '../../config/permissions'
 
 const AccessListPage = () => {
   const [searchForm] = Form.useForm<AccessQuery>()
   const queryClient = useQueryClient()
+  const can = usePermission()
   const [modalForm] = Form.useForm<AccessFormValues>()
   const selectedType = Form.useWatch('type', modalForm)
 
@@ -136,7 +139,7 @@ const AccessListPage = () => {
           form={searchForm}
           onSearch={handleSearch}
           onReset={handleReset}
-          onCreate={openCreate}
+          onCreate={can(BUTTON_PERMISSIONS.access.create) ? openCreate : undefined}
         />
       </Card>
 
@@ -148,6 +151,9 @@ const AccessListPage = () => {
               onView: openDetail,
               onEdit: openEdit,
               onDelete: handleDelete,
+              canView: can(BUTTON_PERMISSIONS.access.view),
+              canEdit: can(BUTTON_PERMISSIONS.access.edit),
+              canDelete: can(BUTTON_PERMISSIONS.access.delete),
             })}
             dataSource={treeData}
             loading={loading}

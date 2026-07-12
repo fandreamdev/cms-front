@@ -19,12 +19,15 @@ import { createUserColumns } from './userColumns'
 import { queryKeys } from '../../app/queryKeys'
 import { getRoleList, type Role } from '../../api/role'
 import { useQueryClient } from '@tanstack/react-query'
+import { usePermission } from '../../shared/hooks/usePermission'
+import { BUTTON_PERMISSIONS } from '../../config/permissions'
 
 const initialQuery: UserQuery = { page: 1, pageSize: 10 }
 
 const UserListPage = () => {
   const [searchForm] = Form.useForm<UserQuery>()
   const queryClient = useQueryClient()
+  const can = usePermission()
   const [modalForm] = Form.useForm<UserPayload>()
 
   const { data, total, loading, query, setQuery } = usePagedQuery(
@@ -170,7 +173,7 @@ const UserListPage = () => {
           form={searchForm}
           onSearch={handleSearch}
           onReset={handleReset}
-          onCreate={openCreate}
+          onCreate={can(BUTTON_PERMISSIONS.user.create) ? openCreate : undefined}
         />
       </Card>
 
@@ -182,6 +185,9 @@ const UserListPage = () => {
               onView: openDetail,
               onEdit: openEdit,
               onDelete: handleDelete,
+              canView: can(BUTTON_PERMISSIONS.user.view),
+              canEdit: can(BUTTON_PERMISSIONS.user.edit),
+              canDelete: can(BUTTON_PERMISSIONS.user.delete),
             })}
             dataSource={data}
             loading={loading}

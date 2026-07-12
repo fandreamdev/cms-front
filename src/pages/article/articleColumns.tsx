@@ -9,12 +9,14 @@ interface Options {
   startIndex: number
   onView: (id: number) => void
   renderActions: (record: Article) => ReactNode
+  canView: boolean
 }
 
 export const createArticleColumns = ({
   startIndex,
   onView,
   renderActions,
+  canView,
 }: Options): ColumnsType<Article> => [
   { title: '序号', key: 'index', width: 70, render: (_, __, index) => startIndex + index + 1 },
   { title: '文章标题', dataIndex: 'title', width: 240, ellipsis: true },
@@ -109,9 +111,11 @@ export const createArticleColumns = ({
     fixed: 'right',
     render: (_, record) => (
       <Space>
-        <Button type="link" size="small" onClick={() => onView(record.id)}>
-          查看
-        </Button>
+        {canView && (
+          <Button type="link" size="small" onClick={() => onView(record.id)}>
+            查看
+          </Button>
+        )}
         {renderActions(record)}
       </Space>
     ),

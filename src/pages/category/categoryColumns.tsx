@@ -7,6 +7,10 @@ interface Options {
   onCreateChild: (record: Category) => void
   onEdit: (record: Category) => void
   onDelete: (id: number) => void
+  canView: boolean
+  canCreate: boolean
+  canEdit: boolean
+  canDelete: boolean
 }
 
 export const createCategoryColumns = ({
@@ -14,6 +18,10 @@ export const createCategoryColumns = ({
   onCreateChild,
   onEdit,
   onDelete,
+  canView,
+  canCreate,
+  canEdit,
+  canDelete,
 }: Options): ColumnsType<Category> => [
   { title: '分类名称', dataIndex: 'name', width: 220 },
   {
@@ -42,26 +50,34 @@ export const createCategoryColumns = ({
     fixed: 'right',
     render: (_, record) => (
       <Space>
-        <Button type="link" size="small" onClick={() => onView(record.id)}>
-          查看
-        </Button>
-        <Button type="link" size="small" onClick={() => onCreateChild(record)}>
-          新增子分类
-        </Button>
-        <Button type="link" size="small" onClick={() => onEdit(record)}>
-          编辑
-        </Button>
-        <Popconfirm
-          title="确定删除该分类吗？"
-          description="如果分类正在被文章使用，后端将拒绝删除。"
-          onConfirm={() => onDelete(record.id)}
-          okText="确定"
-          cancelText="取消"
-        >
-          <Button type="link" size="small" danger>
-            删除
+        {canView && (
+          <Button type="link" size="small" onClick={() => onView(record.id)}>
+            查看
           </Button>
-        </Popconfirm>
+        )}
+        {canCreate && (
+          <Button type="link" size="small" onClick={() => onCreateChild(record)}>
+            新增子分类
+          </Button>
+        )}
+        {canEdit && (
+          <Button type="link" size="small" onClick={() => onEdit(record)}>
+            编辑
+          </Button>
+        )}
+        {canDelete && (
+          <Popconfirm
+            title="确定删除该分类吗？"
+            description="如果分类正在被文章使用，后端将拒绝删除。"
+            onConfirm={() => onDelete(record.id)}
+            okText="确定"
+            cancelText="取消"
+          >
+            <Button type="link" size="small" danger>
+              删除
+            </Button>
+          </Popconfirm>
+        )}
       </Space>
     ),
   },

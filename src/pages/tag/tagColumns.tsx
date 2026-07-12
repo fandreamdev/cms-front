@@ -7,6 +7,9 @@ interface Options {
   onView: (id: number) => void
   onEdit: (record: Tag) => void
   onDelete: (id: number) => void
+  canView: boolean
+  canEdit: boolean
+  canDelete: boolean
 }
 
 export const createTagColumns = ({
@@ -14,6 +17,9 @@ export const createTagColumns = ({
   onView,
   onEdit,
   onDelete,
+  canView,
+  canEdit,
+  canDelete,
 }: Options): ColumnsType<Tag> => [
   { title: '序号', key: 'index', width: 70, render: (_, __, index) => startIndex + index + 1 },
   { title: '标签名称', dataIndex: 'name', width: 200 },
@@ -43,22 +49,28 @@ export const createTagColumns = ({
     fixed: 'right',
     render: (_, record) => (
       <Space>
-        <Button type="link" size="small" onClick={() => onView(record.id)}>
-          查看
-        </Button>
-        <Button type="link" size="small" onClick={() => onEdit(record)}>
-          编辑
-        </Button>
-        <Popconfirm
-          title="确定删除该标签吗？"
-          onConfirm={() => onDelete(record.id)}
-          okText="确定"
-          cancelText="取消"
-        >
-          <Button type="link" size="small" danger>
-            删除
+        {canView && (
+          <Button type="link" size="small" onClick={() => onView(record.id)}>
+            查看
           </Button>
-        </Popconfirm>
+        )}
+        {canEdit && (
+          <Button type="link" size="small" onClick={() => onEdit(record)}>
+            编辑
+          </Button>
+        )}
+        {canDelete && (
+          <Popconfirm
+            title="确定删除该标签吗？"
+            onConfirm={() => onDelete(record.id)}
+            okText="确定"
+            cancelText="取消"
+          >
+            <Button type="link" size="small" danger>
+              删除
+            </Button>
+          </Popconfirm>
+        )}
       </Space>
     ),
   },
