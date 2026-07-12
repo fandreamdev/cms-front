@@ -1,5 +1,5 @@
 import { Layout, theme } from 'antd'
-import { Outlet } from 'react-router'
+import { Outlet } from '@tanstack/react-router'
 import AppHeader from '../components/AppHeader/AppHeader'
 import AppSider from '../components/AppSider/AppSider'
 import { useState } from 'react'

@@ -1,6 +1,6 @@
 import { Layout, Menu } from 'antd'
 import { menuItems } from '../../config/menu'
-import { useLocation, useNavigate } from 'react-router'
+import { useNavigate, useRouterState } from '@tanstack/react-router'
 import AppLogo from '../AppHeader/AppLogo'
 
 interface AppSiderProps {
@@ -9,10 +9,7 @@ interface AppSiderProps {
 
 const AppSider = ({ collapsed }: AppSiderProps) => {
   const navigate = useNavigate()
-  const { pathname } = useLocation()
-  const selectedPath = pathname.startsWith('/admin/content/articles/')
-    ? '/admin/content/articles'
-    : pathname
+  const pathname = useRouterState({ select: (state) => state.location.pathname })
 
   const defaultOpenKeys = pathname
     .split('/')
@@ -20,15 +17,15 @@ const AppSider = ({ collapsed }: AppSiderProps) => {
     .map((_, index, segments) => `/${segments.slice(0, index + 1).join('/')}`)
 
   return (
-    <Layout.Sider theme='dark' collapsed={collapsed}>
+    <Layout.Sider theme="dark" collapsed={collapsed}>
       <AppLogo collapsed={collapsed} />
       <Menu
-        mode='inline'
-        theme='dark'
+        mode="inline"
+        theme="dark"
         items={menuItems}
-        selectedKeys={[selectedPath]}
+        selectedKeys={[pathname]}
         defaultOpenKeys={defaultOpenKeys}
-        onClick={({ key }) => navigate(key)}
+        onClick={({ key }) => navigate({ to: key as never })}
       />
     </Layout.Sider>
   )
