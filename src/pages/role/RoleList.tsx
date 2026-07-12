@@ -11,14 +11,16 @@ import {
   type RolePayload,
   type RoleQuery,
 } from '../../api/role'
-import { usePagedList } from '../../hooks/usePagedList'
-import { useTableScrollY } from '../../hooks/useTableScrollY'
+import { usePagedQuery } from '../../shared/hooks/usePagedQuery'
+import { useTableScrollY } from '../../shared/hooks/useTableScrollY'
 import DetailModal from '../../components/DetailModal'
 import RoleFormModal from './RoleFormModal'
 import RoleSearchForm from './RoleSearchForm'
 import { createRoleColumns } from './roleColumns'
 import { getAccessTree, type AccessTree } from '../../api/access'
 import { typeLabelMap } from '../access/constants'
+import { queryKeys } from '../../app/queryKeys'
+import { useQueryClient } from '@tanstack/react-query'
 
 const initialQuery: RoleQuery = { page: 1, pageSize: 10 }
 
@@ -32,11 +34,13 @@ const toAccessTreeData = (nodes: AccessTree[]): TreeSelectProps['treeData'] =>
 
 const RoleListPage = () => {
   const [searchForm] = Form.useForm<RoleQuery>()
+  const queryClient = useQueryClient()
   const [modalForm] = Form.useForm<RolePayload>()
 
-  const { data, total, loading, query, setQuery, fetchData } = usePagedList(
+  const { data, total, loading, query, setQuery } = usePagedQuery(
     initialQuery,
     getRoleList,
+    queryKeys.roles.all,
   )
 
   const [modalOpen, setModalOpen] = useState(false)
@@ -68,7 +72,9 @@ const RoleListPage = () => {
     setModalOpen(true)
     setAccessLoading(true)
     try {
-      setAccessTree(await getAccessTree())
+      setAccessTree(
+        await queryClient.fetchQuery({ queryKey: queryKeys.accesses.tree, queryFn: getAccessTree }),
+      )
     } catch {
       setModalOpen(false)
     } finally {
@@ -83,7 +89,13 @@ const RoleListPage = () => {
     setModalOpen(true)
     setAccessLoading(true)
     try {
-      const [role, tree] = await Promise.all([getRole(record.id), getAccessTree()])
+      const [role, tree] = await Promise.all([
+        queryClient.fetchQuery({
+          queryKey: queryKeys.roles.detail(record.id),
+          queryFn: () => getRole(record.id),
+        }),
+        queryClient.fetchQuery({ queryKey: queryKeys.accesses.tree, queryFn: getAccessTree }),
+      ])
       setEditing(role)
       setAccessTree(tree)
       modalForm.setFieldsValue({
@@ -102,7 +114,12 @@ const RoleListPage = () => {
     setDetailOpen(true)
     setDetailLoading(true)
     try {
-      setDetail(await getRole(id))
+      setDetail(
+        await queryClient.fetchQuery({
+          queryKey: queryKeys.roles.detail(id),
+          queryFn: () => getRole(id),
+        }),
+      )
     } catch {
       setDetailOpen(false)
     } finally {
@@ -122,7 +139,7 @@ const RoleListPage = () => {
         message.success('新增成功')
       }
       setModalOpen(false)
-      fetchData()
+      queryClient.invalidateQueries({ queryKey: queryKeys.roles.all })
     } finally {
       setSubmitting(false)
     }
@@ -134,7 +151,7 @@ const RoleListPage = () => {
     if (data.length === 1 && (query.page ?? 1) > 1) {
       setQuery((prev) => ({ ...prev, page: (prev.page ?? 1) - 1 }))
     } else {
-      fetchData()
+      queryClient.invalidateQueries({ queryKey: queryKeys.roles.all })
     }
   }
 
@@ -152,8 +169,12 @@ const RoleListPage = () => {
       <Card style={{ flex: 1, minHeight: 0 }} styles={{ body: { height: '100%' } }}>
         <div ref={tableWrapRef} style={{ height: '100%' }}>
           <Table<Role>
-            rowKey='id'
-            columns={createRoleColumns({ onView: openDetail, onEdit: openEdit, onDelete: handleDelete })}
+            rowKey="id"
+            columns={createRoleColumns({
+              onView: openDetail,
+              onEdit: openEdit,
+              onDelete: handleDelete,
+            })}
             dataSource={data}
             loading={loading}
             scroll={{ x: 'max-content', y: scrollY }}
@@ -180,20 +201,24 @@ const RoleListPage = () => {
         onCancel={() => setModalOpen(false)}
       />
       <DetailModal
-        title='角色详情'
+        title="角色详情"
         open={detailOpen}
         loading={detailLoading}
         onCancel={() => setDetailOpen(false)}
-        items={detail ? [
-          { label: 'ID', children: detail.id },
-          { label: '角色名称', children: detail.name },
-          {
-            label: '资源',
-            children: detail.accesses?.map((access) => access.description).join('、') || '-',
-          },
-          { label: '创建时间', children: new Date(detail.createdAt).toLocaleString() },
-          { label: '更新时间', children: new Date(detail.updatedAt).toLocaleString() },
-        ] : []}
+        items={
+          detail
+            ? [
+                { label: 'ID', children: detail.id },
+                { label: '角色名称', children: detail.name },
+                {
+                  label: '资源',
+                  children: detail.accesses?.map((access) => access.description).join('、') || '-',
+                },
+                { label: '创建时间', children: new Date(detail.createdAt).toLocaleString() },
+                { label: '更新时间', children: new Date(detail.updatedAt).toLocaleString() },
+              ]
+            : []
+        }
       />
     </div>
   )

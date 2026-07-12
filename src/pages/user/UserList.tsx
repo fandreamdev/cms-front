@@ -10,23 +10,27 @@ import {
   type UserPayload,
   type UserQuery,
 } from '../../api/user'
-import { usePagedList } from '../../hooks/usePagedList'
-import { useTableScrollY } from '../../hooks/useTableScrollY'
+import { usePagedQuery } from '../../shared/hooks/usePagedQuery'
+import { useTableScrollY } from '../../shared/hooks/useTableScrollY'
 import DetailModal from '../../components/DetailModal'
 import UserFormModal from './UserFormModal'
 import UserSearchForm from './UserSearchForm'
 import { createUserColumns } from './userColumns'
+import { queryKeys } from '../../app/queryKeys'
 import { getRoleList, type Role } from '../../api/role'
+import { useQueryClient } from '@tanstack/react-query'
 
 const initialQuery: UserQuery = { page: 1, pageSize: 10 }
 
 const UserListPage = () => {
   const [searchForm] = Form.useForm<UserQuery>()
+  const queryClient = useQueryClient()
   const [modalForm] = Form.useForm<UserPayload>()
 
-  const { data, total, loading, query, setQuery, fetchData } = usePagedList(
+  const { data, total, loading, query, setQuery } = usePagedQuery(
     initialQuery,
     getUserList,
+    queryKeys.users.all,
   )
 
   const [modalOpen, setModalOpen] = useState(false)
@@ -58,7 +62,10 @@ const UserListPage = () => {
     setModalOpen(true)
     setRoleLoading(true)
     try {
-      const roleResult = await getRoleList({ page: 1, pageSize: 1000 })
+      const roleResult = await queryClient.fetchQuery({
+        queryKey: queryKeys.roles.list({ page: 1, pageSize: 1000 }),
+        queryFn: () => getRoleList({ page: 1, pageSize: 1000 }),
+      })
       setRoles(roleResult.list)
     } catch {
       setModalOpen(false)
@@ -83,8 +90,14 @@ const UserListPage = () => {
     setRoleLoading(true)
     try {
       const [user, roleResult] = await Promise.all([
-        getUser(record.id),
-        getRoleList({ page: 1, pageSize: 1000 }),
+        queryClient.fetchQuery({
+          queryKey: queryKeys.users.detail(record.id),
+          queryFn: () => getUser(record.id),
+        }),
+        queryClient.fetchQuery({
+          queryKey: queryKeys.roles.list({ page: 1, pageSize: 1000 }),
+          queryFn: () => getRoleList({ page: 1, pageSize: 1000 }),
+        }),
       ])
       setEditing(user)
       setRoles(roleResult.list)
@@ -109,7 +122,12 @@ const UserListPage = () => {
     setDetailOpen(true)
     setDetailLoading(true)
     try {
-      setDetail(await getUser(id))
+      setDetail(
+        await queryClient.fetchQuery({
+          queryKey: queryKeys.users.detail(id),
+          queryFn: () => getUser(id),
+        }),
+      )
     } catch {
       setDetailOpen(false)
     } finally {
@@ -129,7 +147,7 @@ const UserListPage = () => {
         message.success('新增成功')
       }
       setModalOpen(false)
-      fetchData()
+      queryClient.invalidateQueries({ queryKey: queryKeys.users.all })
     } finally {
       setSubmitting(false)
     }
@@ -141,7 +159,7 @@ const UserListPage = () => {
     if (data.length === 1 && (query.page ?? 1) > 1) {
       setQuery((prev) => ({ ...prev, page: (prev.page ?? 1) - 1 }))
     } else {
-      fetchData()
+      queryClient.invalidateQueries({ queryKey: queryKeys.users.all })
     }
   }
 
@@ -159,8 +177,12 @@ const UserListPage = () => {
       <Card style={{ flex: 1, minHeight: 0 }} styles={{ body: { height: '100%' } }}>
         <div ref={tableWrapRef} style={{ height: '100%' }}>
           <Table<User>
-            rowKey='id'
-            columns={createUserColumns({ onView: openDetail, onEdit: openEdit, onDelete: handleDelete })}
+            rowKey="id"
+            columns={createUserColumns({
+              onView: openDetail,
+              onEdit: openEdit,
+              onDelete: handleDelete,
+            })}
             dataSource={data}
             loading={loading}
             scroll={{ x: 'max-content', y: scrollY }}
@@ -187,22 +209,29 @@ const UserListPage = () => {
         onCancel={() => setModalOpen(false)}
       />
       <DetailModal
-        title='用户详情'
+        title="用户详情"
         open={detailOpen}
         loading={detailLoading}
         onCancel={() => setDetailOpen(false)}
-        items={detail ? [
-          { label: 'ID', children: detail.id },
-          { label: '用户名', children: detail.username },
-          { label: '手机号', children: detail.mobile || '-' },
-          { label: '邮箱', children: detail.email || '-' },
-          { label: '状态', children: detail.status === 1 ? '启用' : '禁用' },
-          { label: '是否超管', children: detail.isSuper === 1 ? '是' : '否' },
-          { label: '排序', children: detail.sort },
-          { label: '角色', children: detail.roles?.map((role) => role.name).join('、') || '-' },
-          { label: '创建时间', children: new Date(detail.createdAt).toLocaleString() },
-          { label: '更新时间', children: new Date(detail.updatedAt).toLocaleString() },
-        ] : []}
+        items={
+          detail
+            ? [
+                { label: 'ID', children: detail.id },
+                { label: '用户名', children: detail.username },
+                { label: '手机号', children: detail.mobile || '-' },
+                { label: '邮箱', children: detail.email || '-' },
+                { label: '状态', children: detail.status === 1 ? '启用' : '禁用' },
+                { label: '是否超管', children: detail.isSuper === 1 ? '是' : '否' },
+                { label: '排序', children: detail.sort },
+                {
+                  label: '角色',
+                  children: detail.roles?.map((role) => role.name).join('、') || '-',
+                },
+                { label: '创建时间', children: new Date(detail.createdAt).toLocaleString() },
+                { label: '更新时间', children: new Date(detail.updatedAt).toLocaleString() },
+              ]
+            : []
+        }
       />
     </div>
   )

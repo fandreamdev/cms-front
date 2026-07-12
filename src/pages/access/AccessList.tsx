@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Card, Form, Table, message } from 'antd'
 import {
   createAccess,
@@ -8,9 +9,8 @@ import {
   updateAccess,
   type Access,
   type AccessQuery,
-  type AccessTree,
 } from '../../api/access'
-import { useTableScrollY } from '../../hooks/useTableScrollY'
+import { useTableScrollY } from '../../shared/hooks/useTableScrollY'
 import DetailModal from '../../components/DetailModal'
 import AccessFormModal from './AccessFormModal'
 import AccessSearchForm from './AccessSearchForm'
@@ -25,15 +25,19 @@ import {
   toAccessPayload,
 } from './treeUtils'
 import type { AccessFormValues, AccessTreeNode } from './types'
+import { queryKeys } from '../../app/queryKeys'
 
 const AccessListPage = () => {
   const [searchForm] = Form.useForm<AccessQuery>()
+  const queryClient = useQueryClient()
   const [modalForm] = Form.useForm<AccessFormValues>()
   const selectedType = Form.useWatch('type', modalForm)
 
-  const [tree, setTree] = useState<AccessTree[]>([])
-  const [loading, setLoading] = useState(false)
   const [query, setQuery] = useState<AccessQuery>({})
+  const { data: tree = [], isFetching: loading } = useQuery({
+    queryKey: queryKeys.accesses.tree,
+    queryFn: getAccessTree,
+  })
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Access | null>(null)
@@ -52,22 +56,6 @@ const AccessListPage = () => {
     () => buildParentOptions(tree, editing, selectedType),
     [tree, editing, selectedType],
   )
-
-  const fetchData = useCallback(async () => {
-    setLoading(true)
-    try {
-      const res = await getAccessTree()
-      setTree(res)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    // 依赖接口树同步资源列表
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchData()
-  }, [fetchData])
 
   const handleSearch = () => {
     setQuery(searchForm.getFieldsValue())
@@ -104,7 +92,12 @@ const AccessListPage = () => {
     setDetailOpen(true)
     setDetailLoading(true)
     try {
-      setDetail(await getAccess(id))
+      setDetail(
+        await queryClient.fetchQuery({
+          queryKey: queryKeys.accesses.detail(id),
+          queryFn: () => getAccess(id),
+        }),
+      )
     } catch {
       setDetailOpen(false)
     } finally {
@@ -124,7 +117,7 @@ const AccessListPage = () => {
         message.success('新增成功')
       }
       setModalOpen(false)
-      fetchData()
+      queryClient.invalidateQueries({ queryKey: queryKeys.accesses.all })
     } finally {
       setSubmitting(false)
     }
@@ -133,7 +126,7 @@ const AccessListPage = () => {
   const handleDelete = async (id: number) => {
     await deleteAccess(id)
     message.success('删除成功')
-    fetchData()
+    queryClient.invalidateQueries({ queryKey: queryKeys.accesses.all })
   }
 
   return (
@@ -150,8 +143,12 @@ const AccessListPage = () => {
       <Card style={{ flex: 1, minHeight: 0 }} styles={{ body: { height: '100%' } }}>
         <div ref={tableWrapRef} style={{ height: '100%' }}>
           <Table<AccessTreeNode>
-            rowKey='id'
-            columns={createAccessColumns({ onView: openDetail, onEdit: openEdit, onDelete: handleDelete })}
+            rowKey="id"
+            columns={createAccessColumns({
+              onView: openDetail,
+              onEdit: openEdit,
+              onDelete: handleDelete,
+            })}
             dataSource={treeData}
             loading={loading}
             pagination={false}
@@ -175,24 +172,29 @@ const AccessListPage = () => {
         onCancel={() => setModalOpen(false)}
       />
       <DetailModal
-        title='资源详情'
+        title="资源详情"
         open={detailOpen}
         loading={detailLoading}
         onCancel={() => setDetailOpen(false)}
-        items={detail ? [
-          { label: 'ID', children: detail.id },
-          { label: '资源名称', children: detail.description },
-          { label: '类型', children: typeLabelMap[detail.type] },
-          { label: '资源标识', children: detail.url },
-          {
-            label: '上级资源名称',
-            children: detail.parentId === null
-              ? '-'
-              : flatData.find((item) => item.id === detail.parentId)?.description ?? '-',
-          },
-          { label: '创建时间', children: new Date(detail.createdAt).toLocaleString() },
-          { label: '更新时间', children: new Date(detail.updatedAt).toLocaleString() },
-        ] : []}
+        items={
+          detail
+            ? [
+                { label: 'ID', children: detail.id },
+                { label: '资源名称', children: detail.description },
+                { label: '类型', children: typeLabelMap[detail.type] },
+                { label: '资源标识', children: detail.url },
+                {
+                  label: '上级资源名称',
+                  children:
+                    detail.parentId === null
+                      ? '-'
+                      : (flatData.find((item) => item.id === detail.parentId)?.description ?? '-'),
+                },
+                { label: '创建时间', children: new Date(detail.createdAt).toLocaleString() },
+                { label: '更新时间', children: new Date(detail.updatedAt).toLocaleString() },
+              ]
+            : []
+        }
       />
     </div>
   )

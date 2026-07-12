@@ -1,7 +1,7 @@
 import request from '../utils/request'
 import type { PagedResult } from './types'
 
-export interface UserRole {
+interface UserRole {
   id: number
   name: string
 }

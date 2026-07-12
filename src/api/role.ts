@@ -2,7 +2,7 @@ import request from '../utils/request'
 import type { AccessType } from './access'
 import type { PagedResult } from './types'
 
-export interface RoleAccess {
+interface RoleAccess {
   id: number
   type: AccessType
   url: string
