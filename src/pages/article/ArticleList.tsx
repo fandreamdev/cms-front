@@ -11,7 +11,7 @@ import { getCategoryTree, type Category } from '../../api/category'
 import { hasPermission } from '../../api/auth'
 import { useAuth } from '../../contexts/authContextValue'
 import { queryKeys } from '../../app/queryKeys'
-import { BUTTON_PERMISSIONS } from '../../config/permissions'
+import { BUTTON_PERMISSIONS, MENU_PERMISSIONS } from '../../config/permissions'
 import ArticleActions from './ArticleActions'
 
 const articleInitialQuery: ArticleQuery = { page: 1, pageSize: 10 }
@@ -60,7 +60,10 @@ const ArticleListPage = ({ reviewMode = false }: ArticleListPageProps) => {
           form={searchForm}
           categoryTreeData={toCategoryTreeData(categories)}
           showApprovalFilter={!reviewMode}
-          canSearch={hasPermission(user, BUTTON_PERMISSIONS.article.list)}
+          canSearch={hasPermission(
+            user,
+            reviewMode ? MENU_PERMISSIONS.reviews : BUTTON_PERMISSIONS.article.list,
+          )}
           onSearch={() =>
             setQuery((prev) => ({
               ...prev,

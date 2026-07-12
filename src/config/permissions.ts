@@ -1,11 +1,21 @@
 export const MENU_PERMISSIONS = {
-  reviews: '/admin/reviews/articles',
-  users: '/admin/system/users',
-  roles: '/admin/system/roles',
-  accesses: '/admin/system/accesses',
-  articles: '/admin/content/articles',
-  categories: '/admin/content/categories',
-  tags: '/admin/content/tags',
+  reviews: 'article:review:list',
+  users: 'user:list',
+  roles: 'role:list',
+  accesses: 'access:list',
+  articles: 'article:list',
+  categories: 'category:list',
+  tags: 'tag:list',
+} as const
+
+const ROUTE_PERMISSIONS = {
+  '/admin/reviews/articles': MENU_PERMISSIONS.reviews,
+  '/admin/system/users': MENU_PERMISSIONS.users,
+  '/admin/system/roles': MENU_PERMISSIONS.roles,
+  '/admin/system/accesses': MENU_PERMISSIONS.accesses,
+  '/admin/content/articles': MENU_PERMISSIONS.articles,
+  '/admin/content/categories': MENU_PERMISSIONS.categories,
+  '/admin/content/tags': MENU_PERMISSIONS.tags,
 } as const
 
 export const BUTTON_PERMISSIONS = {
@@ -58,6 +68,6 @@ export const BUTTON_PERMISSIONS = {
 } as const
 
 export const getMenuPermission = (pathname: string) =>
-  Object.values(MENU_PERMISSIONS)
-    .sort((a, b) => b.length - a.length)
-    .find((permission) => pathname === permission || pathname.startsWith(`${permission}/`))
+  Object.entries(ROUTE_PERMISSIONS)
+    .sort(([a], [b]) => b.length - a.length)
+    .find(([route]) => pathname === route || pathname.startsWith(`${route}/`))?.[1]

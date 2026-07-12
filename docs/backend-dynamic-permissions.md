@@ -14,12 +14,22 @@
 - `/admin/content/categories`
 - `/admin/content/tags`
 
+菜单是否显示及对应页面是否允许访问，使用该菜单的列表权限判断：
+
+- 文章审批：`article:review:list`
+- 用户列表：`user:list`
+- 角色列表：`role:list`
+- 资源列表：`access:list`
+- 文章管理：`article:list`
+- 分类管理：`category:list`
+- 标签管理：`tag:list`
+
 按钮资源：
 
 - 用户：`user:list`、`user:create`、`user:view`、`user:edit`、`user:delete`
 - 角色：`role:list`、`role:create`、`role:view`、`role:edit`、`role:delete`
 - 资源：`access:list`、`access:create`、`access:view`、`access:edit`、`access:delete`
-- 文章：`article:list`、`article:create`、`article:view`、`article:edit`、`article:delete`、`article:submit`、`article:withdraw`、`article:approve`、`article:status`
+- 文章：`article:list`、`article:review:list`、`article:create`、`article:view`、`article:edit`、`article:delete`、`article:submit`、`article:withdraw`、`article:approve`、`article:status`
 - 分类：`category:list`、`category:create`、`category:view`、`category:edit`、`category:delete`
 - 标签：`tag:list`、`tag:create`、`tag:view`、`tag:edit`、`tag:delete`
 
