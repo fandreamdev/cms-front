@@ -19,6 +19,7 @@ import { createCategoryColumns } from './categoryColumns'
 import { queryKeys } from '../../app/queryKeys'
 import { usePermission } from '../../shared/hooks/usePermission'
 import { BUTTON_PERMISSIONS } from '../../config/permissions'
+import { useDetailModal } from '../../shared/hooks/useDetailModal'
 
 const ROOT_ID = 0
 const flatten = (nodes: Category[]): Category[] =>
@@ -39,11 +40,14 @@ const CategoryListPage = () => {
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Category | null>(null)
   const [submitting, setSubmitting] = useState(false)
-  const [detailOpen, setDetailOpen] = useState(false)
-  const [detailLoading, setDetailLoading] = useState(false)
-  const [detail, setDetail] = useState<Category | null>(null)
   const { ref, scrollY } = useTableScrollY()
   const flatData = useMemo(() => flatten(tree), [tree])
+  const detailModal = useDetailModal((id) =>
+    queryClient.fetchQuery({
+      queryKey: queryKeys.categories.detail(id),
+      queryFn: () => getCategory(id),
+    }),
+  )
 
   const filteredTree = useMemo(() => {
     const filter = (nodes: Category[]): Category[] =>
@@ -88,23 +92,6 @@ const CategoryListPage = () => {
     })
     setModalOpen(true)
   }
-  const openDetail = async (id: number) => {
-    setDetail(null)
-    setDetailOpen(true)
-    setDetailLoading(true)
-    try {
-      setDetail(
-        await queryClient.fetchQuery({
-          queryKey: queryKeys.categories.detail(id),
-          queryFn: () => getCategory(id),
-        }),
-      )
-    } catch {
-      setDetailOpen(false)
-    } finally {
-      setDetailLoading(false)
-    }
-  }
   const handleSubmit = async () => {
     const values = await modalForm.validateFields()
     const payload = {
@@ -147,7 +134,7 @@ const CategoryListPage = () => {
           <Table<Category>
             rowKey="id"
             columns={createCategoryColumns({
-              onView: openDetail,
+              onView: detailModal.show,
               onCreateChild: (record) => openCreate(record.id),
               onEdit: openEdit,
               onDelete: handleDelete,
@@ -176,25 +163,32 @@ const CategoryListPage = () => {
       />
       <DetailModal
         title="分类详情"
-        open={detailOpen}
-        loading={detailLoading}
-        onCancel={() => setDetailOpen(false)}
+        open={detailModal.open}
+        loading={detailModal.loading}
+        onCancel={detailModal.close}
         items={
-          detail
+          detailModal.detail
             ? [
-                { label: 'ID', children: detail.id },
-                { label: '分类名称', children: detail.name },
-                { label: '分类描述', children: detail.description || '-' },
+                { label: 'ID', children: detailModal.detail.id },
+                { label: '分类名称', children: detailModal.detail.name },
+                { label: '分类描述', children: detailModal.detail.description || '-' },
                 {
                   label: '上级分类',
                   children:
-                    detail.parentId === null
+                    detailModal.detail.parentId === null
                       ? '-'
-                      : flatData.find((item) => item.id === detail.parentId)?.name || '-',
+                      : flatData.find((item) => item.id === detailModal.detail!.parentId)?.name ||
+                        '-',
                 },
-                { label: '排序', children: detail.sort },
-                { label: '创建时间', children: new Date(detail.createdAt).toLocaleString() },
-                { label: '更新时间', children: new Date(detail.updatedAt).toLocaleString() },
+                { label: '排序', children: detailModal.detail.sort },
+                {
+                  label: '创建时间',
+                  children: new Date(detailModal.detail.createdAt).toLocaleString(),
+                },
+                {
+                  label: '更新时间',
+                  children: new Date(detailModal.detail.updatedAt).toLocaleString(),
+                },
               ]
             : []
         }

@@ -23,6 +23,7 @@ import { queryKeys } from '../../app/queryKeys'
 import { useQueryClient } from '@tanstack/react-query'
 import { usePermission } from '../../shared/hooks/usePermission'
 import { BUTTON_PERMISSIONS } from '../../config/permissions'
+import { useDetailModal } from '../../shared/hooks/useDetailModal'
 
 const initialQuery: RoleQuery = { page: 1, pageSize: 10 }
 
@@ -49,13 +50,13 @@ const RoleListPage = () => {
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Role | null>(null)
   const [submitting, setSubmitting] = useState(false)
-  const [detailOpen, setDetailOpen] = useState(false)
-  const [detailLoading, setDetailLoading] = useState(false)
-  const [detail, setDetail] = useState<Role | null>(null)
   const [accessTree, setAccessTree] = useState<AccessTree[]>([])
   const [accessLoading, setAccessLoading] = useState(false)
 
   const { ref: tableWrapRef, scrollY } = useTableScrollY()
+  const detailModal = useDetailModal((id) =>
+    queryClient.fetchQuery({ queryKey: queryKeys.roles.detail(id), queryFn: () => getRole(id) }),
+  )
 
   const handleSearch = () => {
     const values = searchForm.getFieldsValue()
@@ -112,24 +113,6 @@ const RoleListPage = () => {
     }
   }
 
-  const openDetail = async (id: number) => {
-    setDetail(null)
-    setDetailOpen(true)
-    setDetailLoading(true)
-    try {
-      setDetail(
-        await queryClient.fetchQuery({
-          queryKey: queryKeys.roles.detail(id),
-          queryFn: () => getRole(id),
-        }),
-      )
-    } catch {
-      setDetailOpen(false)
-    } finally {
-      setDetailLoading(false)
-    }
-  }
-
   const handleSubmit = async () => {
     const values = await modalForm.validateFields()
     setSubmitting(true)
@@ -174,7 +157,7 @@ const RoleListPage = () => {
           <Table<Role>
             rowKey="id"
             columns={createRoleColumns({
-              onView: openDetail,
+              onView: detailModal.show,
               onEdit: openEdit,
               onDelete: handleDelete,
               canView: can(BUTTON_PERMISSIONS.role.view),
@@ -208,20 +191,28 @@ const RoleListPage = () => {
       />
       <DetailModal
         title="角色详情"
-        open={detailOpen}
-        loading={detailLoading}
-        onCancel={() => setDetailOpen(false)}
+        open={detailModal.open}
+        loading={detailModal.loading}
+        onCancel={detailModal.close}
         items={
-          detail
+          detailModal.detail
             ? [
-                { label: 'ID', children: detail.id },
-                { label: '角色名称', children: detail.name },
+                { label: 'ID', children: detailModal.detail.id },
+                { label: '角色名称', children: detailModal.detail.name },
                 {
                   label: '资源',
-                  children: detail.accesses?.map((access) => access.description).join('、') || '-',
+                  children:
+                    detailModal.detail.accesses?.map((access) => access.description).join('、') ||
+                    '-',
                 },
-                { label: '创建时间', children: new Date(detail.createdAt).toLocaleString() },
-                { label: '更新时间', children: new Date(detail.updatedAt).toLocaleString() },
+                {
+                  label: '创建时间',
+                  children: new Date(detailModal.detail.createdAt).toLocaleString(),
+                },
+                {
+                  label: '更新时间',
+                  children: new Date(detailModal.detail.updatedAt).toLocaleString(),
+                },
               ]
             : []
         }

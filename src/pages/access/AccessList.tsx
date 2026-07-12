@@ -28,6 +28,7 @@ import type { AccessFormValues, AccessTreeNode } from './types'
 import { queryKeys } from '../../app/queryKeys'
 import { usePermission } from '../../shared/hooks/usePermission'
 import { BUTTON_PERMISSIONS } from '../../config/permissions'
+import { useDetailModal } from '../../shared/hooks/useDetailModal'
 
 const AccessListPage = () => {
   const [searchForm] = Form.useForm<AccessQuery>()
@@ -45,11 +46,14 @@ const AccessListPage = () => {
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Access | null>(null)
   const [submitting, setSubmitting] = useState(false)
-  const [detailOpen, setDetailOpen] = useState(false)
-  const [detailLoading, setDetailLoading] = useState(false)
-  const [detail, setDetail] = useState<Access | null>(null)
 
   const { ref: tableWrapRef, scrollY } = useTableScrollY()
+  const detailModal = useDetailModal((id) =>
+    queryClient.fetchQuery({
+      queryKey: queryKeys.accesses.detail(id),
+      queryFn: () => getAccess(id),
+    }),
+  )
 
   const flatData = useMemo(() => flattenAccessTree(tree), [tree])
   const filteredTree = useMemo(() => filterAccessTree(tree, query), [tree, query])
@@ -88,24 +92,6 @@ const AccessListPage = () => {
       parentId: record.parentId ?? ROOT_PARENT_VALUE,
     })
     setModalOpen(true)
-  }
-
-  const openDetail = async (id: number) => {
-    setDetail(null)
-    setDetailOpen(true)
-    setDetailLoading(true)
-    try {
-      setDetail(
-        await queryClient.fetchQuery({
-          queryKey: queryKeys.accesses.detail(id),
-          queryFn: () => getAccess(id),
-        }),
-      )
-    } catch {
-      setDetailOpen(false)
-    } finally {
-      setDetailLoading(false)
-    }
   }
 
   const handleSubmit = async () => {
@@ -148,7 +134,7 @@ const AccessListPage = () => {
           <Table<AccessTreeNode>
             rowKey="id"
             columns={createAccessColumns({
-              onView: openDetail,
+              onView: detailModal.show,
               onEdit: openEdit,
               onDelete: handleDelete,
               canView: can(BUTTON_PERMISSIONS.access.view),
@@ -179,25 +165,32 @@ const AccessListPage = () => {
       />
       <DetailModal
         title="资源详情"
-        open={detailOpen}
-        loading={detailLoading}
-        onCancel={() => setDetailOpen(false)}
+        open={detailModal.open}
+        loading={detailModal.loading}
+        onCancel={detailModal.close}
         items={
-          detail
+          detailModal.detail
             ? [
-                { label: 'ID', children: detail.id },
-                { label: '资源名称', children: detail.description },
-                { label: '类型', children: typeLabelMap[detail.type] },
-                { label: '资源标识', children: detail.url },
+                { label: 'ID', children: detailModal.detail.id },
+                { label: '资源名称', children: detailModal.detail.description },
+                { label: '类型', children: typeLabelMap[detailModal.detail.type] },
+                { label: '资源标识', children: detailModal.detail.url },
                 {
                   label: '上级资源名称',
                   children:
-                    detail.parentId === null
+                    detailModal.detail.parentId === null
                       ? '-'
-                      : (flatData.find((item) => item.id === detail.parentId)?.description ?? '-'),
+                      : (flatData.find((item) => item.id === detailModal.detail!.parentId)
+                          ?.description ?? '-'),
                 },
-                { label: '创建时间', children: new Date(detail.createdAt).toLocaleString() },
-                { label: '更新时间', children: new Date(detail.updatedAt).toLocaleString() },
+                {
+                  label: '创建时间',
+                  children: new Date(detailModal.detail.createdAt).toLocaleString(),
+                },
+                {
+                  label: '更新时间',
+                  children: new Date(detailModal.detail.updatedAt).toLocaleString(),
+                },
               ]
             : []
         }

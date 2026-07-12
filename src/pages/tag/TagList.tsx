@@ -20,6 +20,7 @@ import { queryKeys } from '../../app/queryKeys'
 import { useQueryClient } from '@tanstack/react-query'
 import { usePermission } from '../../shared/hooks/usePermission'
 import { BUTTON_PERMISSIONS } from '../../config/permissions'
+import { useDetailModal } from '../../shared/hooks/useDetailModal'
 
 const initialQuery: TagQuery = { page: 1, pageSize: 10 }
 
@@ -36,10 +37,10 @@ const TagListPage = () => {
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Tag | null>(null)
   const [submitting, setSubmitting] = useState(false)
-  const [detailOpen, setDetailOpen] = useState(false)
-  const [detailLoading, setDetailLoading] = useState(false)
-  const [detail, setDetail] = useState<Tag | null>(null)
   const { ref, scrollY } = useTableScrollY()
+  const detailModal = useDetailModal((id) =>
+    queryClient.fetchQuery({ queryKey: queryKeys.tags.detail(id), queryFn: () => getTag(id) }),
+  )
 
   const openCreate = () => {
     setEditing(null)
@@ -61,24 +62,6 @@ const TagListPage = () => {
       modalForm.setFieldsValue({ name: tag.name, description: tag.description, sort: tag.sort })
     } catch {
       setModalOpen(false)
-    }
-  }
-
-  const openDetail = async (id: number) => {
-    setDetail(null)
-    setDetailOpen(true)
-    setDetailLoading(true)
-    try {
-      setDetail(
-        await queryClient.fetchQuery({
-          queryKey: queryKeys.tags.detail(id),
-          queryFn: () => getTag(id),
-        }),
-      )
-    } catch {
-      setDetailOpen(false)
-    } finally {
-      setDetailLoading(false)
     }
   }
 
@@ -126,7 +109,7 @@ const TagListPage = () => {
             rowKey="id"
             columns={createTagColumns({
               startIndex: ((query.page ?? 1) - 1) * (query.pageSize ?? 10),
-              onView: openDetail,
+              onView: detailModal.show,
               onEdit: openEdit,
               onDelete: handleDelete,
               canView: can(BUTTON_PERMISSIONS.tag.view),
@@ -157,18 +140,24 @@ const TagListPage = () => {
       />
       <DetailModal
         title="标签详情"
-        open={detailOpen}
-        loading={detailLoading}
-        onCancel={() => setDetailOpen(false)}
+        open={detailModal.open}
+        loading={detailModal.loading}
+        onCancel={detailModal.close}
         items={
-          detail
+          detailModal.detail
             ? [
-                { label: 'ID', children: detail.id },
-                { label: '标签名称', children: detail.name },
-                { label: '标签描述', children: detail.description || '-' },
-                { label: '排序', children: detail.sort },
-                { label: '创建时间', children: new Date(detail.createdAt).toLocaleString() },
-                { label: '更新时间', children: new Date(detail.updatedAt).toLocaleString() },
+                { label: 'ID', children: detailModal.detail.id },
+                { label: '标签名称', children: detailModal.detail.name },
+                { label: '标签描述', children: detailModal.detail.description || '-' },
+                { label: '排序', children: detailModal.detail.sort },
+                {
+                  label: '创建时间',
+                  children: new Date(detailModal.detail.createdAt).toLocaleString(),
+                },
+                {
+                  label: '更新时间',
+                  children: new Date(detailModal.detail.updatedAt).toLocaleString(),
+                },
               ]
             : []
         }

@@ -21,6 +21,7 @@ import { getRoleList, type Role } from '../../api/role'
 import { useQueryClient } from '@tanstack/react-query'
 import { usePermission } from '../../shared/hooks/usePermission'
 import { BUTTON_PERMISSIONS } from '../../config/permissions'
+import { useDetailModal } from '../../shared/hooks/useDetailModal'
 
 const initialQuery: UserQuery = { page: 1, pageSize: 10 }
 
@@ -39,13 +40,13 @@ const UserListPage = () => {
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<User | null>(null)
   const [submitting, setSubmitting] = useState(false)
-  const [detailOpen, setDetailOpen] = useState(false)
-  const [detailLoading, setDetailLoading] = useState(false)
-  const [detail, setDetail] = useState<User | null>(null)
   const [roles, setRoles] = useState<Role[]>([])
   const [roleLoading, setRoleLoading] = useState(false)
 
   const { ref: tableWrapRef, scrollY } = useTableScrollY()
+  const detailModal = useDetailModal((id) =>
+    queryClient.fetchQuery({ queryKey: queryKeys.users.detail(id), queryFn: () => getUser(id) }),
+  )
 
   const handleSearch = () => {
     const values = searchForm.getFieldsValue()
@@ -120,24 +121,6 @@ const UserListPage = () => {
     }
   }
 
-  const openDetail = async (id: number) => {
-    setDetail(null)
-    setDetailOpen(true)
-    setDetailLoading(true)
-    try {
-      setDetail(
-        await queryClient.fetchQuery({
-          queryKey: queryKeys.users.detail(id),
-          queryFn: () => getUser(id),
-        }),
-      )
-    } catch {
-      setDetailOpen(false)
-    } finally {
-      setDetailLoading(false)
-    }
-  }
-
   const handleSubmit = async () => {
     const values = await modalForm.validateFields()
     setSubmitting(true)
@@ -182,7 +165,7 @@ const UserListPage = () => {
           <Table<User>
             rowKey="id"
             columns={createUserColumns({
-              onView: openDetail,
+              onView: detailModal.show,
               onEdit: openEdit,
               onDelete: handleDelete,
               canView: can(BUTTON_PERMISSIONS.user.view),
@@ -216,25 +199,31 @@ const UserListPage = () => {
       />
       <DetailModal
         title="用户详情"
-        open={detailOpen}
-        loading={detailLoading}
-        onCancel={() => setDetailOpen(false)}
+        open={detailModal.open}
+        loading={detailModal.loading}
+        onCancel={detailModal.close}
         items={
-          detail
+          detailModal.detail
             ? [
-                { label: 'ID', children: detail.id },
-                { label: '用户名', children: detail.username },
-                { label: '手机号', children: detail.mobile || '-' },
-                { label: '邮箱', children: detail.email || '-' },
-                { label: '状态', children: detail.status === 1 ? '启用' : '禁用' },
-                { label: '是否超管', children: detail.isSuper === 1 ? '是' : '否' },
-                { label: '排序', children: detail.sort },
+                { label: 'ID', children: detailModal.detail.id },
+                { label: '用户名', children: detailModal.detail.username },
+                { label: '手机号', children: detailModal.detail.mobile || '-' },
+                { label: '邮箱', children: detailModal.detail.email || '-' },
+                { label: '状态', children: detailModal.detail.status === 1 ? '启用' : '禁用' },
+                { label: '是否超管', children: detailModal.detail.isSuper === 1 ? '是' : '否' },
+                { label: '排序', children: detailModal.detail.sort },
                 {
                   label: '角色',
-                  children: detail.roles?.map((role) => role.name).join('、') || '-',
+                  children: detailModal.detail.roles?.map((role) => role.name).join('、') || '-',
                 },
-                { label: '创建时间', children: new Date(detail.createdAt).toLocaleString() },
-                { label: '更新时间', children: new Date(detail.updatedAt).toLocaleString() },
+                {
+                  label: '创建时间',
+                  children: new Date(detailModal.detail.createdAt).toLocaleString(),
+                },
+                {
+                  label: '更新时间',
+                  children: new Date(detailModal.detail.updatedAt).toLocaleString(),
+                },
               ]
             : []
         }
