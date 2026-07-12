@@ -11,9 +11,10 @@ interface Props {
   onSearch: () => void
   onReset: () => void
   onCreate?: () => void
+  canSearch: boolean
 }
 
-const CategorySearchForm = ({ form, onSearch, onReset, onCreate }: Props) => (
+const CategorySearchForm = ({ form, onSearch, onReset, onCreate, canSearch }: Props) => (
   <Form form={form} onFinish={onSearch}>
     <Flex gap={24} wrap>
       <Form.Item name="name" label="分类名称">
@@ -30,9 +31,11 @@ const CategorySearchForm = ({ form, onSearch, onReset, onCreate }: Props) => (
             新增分类
           </Button>
         )}
-        <Button type="primary" htmlType="submit">
-          查询
-        </Button>
+        {canSearch && (
+          <Button type="primary" htmlType="submit">
+            查询
+          </Button>
+        )}
         <Button onClick={onReset}>重置</Button>
       </Space>
     </Form.Item>

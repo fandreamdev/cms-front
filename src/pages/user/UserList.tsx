@@ -157,6 +157,7 @@ const UserListPage = () => {
           onSearch={handleSearch}
           onReset={handleReset}
           onCreate={can(BUTTON_PERMISSIONS.user.create) ? openCreate : undefined}
+          canSearch={can(BUTTON_PERMISSIONS.user.list)}
         />
       </Card>
 

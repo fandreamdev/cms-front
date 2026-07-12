@@ -127,6 +127,7 @@ const CategoryListPage = () => {
             setQuery({})
           }}
           onCreate={can(BUTTON_PERMISSIONS.category.create) ? () => openCreate() : undefined}
+          canSearch={can(BUTTON_PERMISSIONS.category.list)}
         />
       </Card>
       <Card style={{ flex: 1, minHeight: 0 }} styles={{ body: { height: '100%' } }}>

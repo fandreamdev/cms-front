@@ -8,9 +8,10 @@ interface RoleSearchFormProps {
   onSearch: () => void
   onReset: () => void
   onCreate?: () => void
+  canSearch: boolean
 }
 
-const RoleSearchForm = ({ form, onSearch, onReset, onCreate }: RoleSearchFormProps) => (
+const RoleSearchForm = ({ form, onSearch, onReset, onCreate, canSearch }: RoleSearchFormProps) => (
   <Form form={form} onFinish={onSearch}>
     <Flex gap={32} wrap>
       <Form.Item name="name" label="角色名称">
@@ -24,9 +25,11 @@ const RoleSearchForm = ({ form, onSearch, onReset, onCreate }: RoleSearchFormPro
             新增角色
           </Button>
         )}
-        <Button type="primary" htmlType="submit">
-          查询
-        </Button>
+        {canSearch && (
+          <Button type="primary" htmlType="submit">
+            查询
+          </Button>
+        )}
         <Button onClick={onReset}>重置</Button>
       </Space>
     </Form.Item>

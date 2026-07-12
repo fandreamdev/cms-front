@@ -8,9 +8,10 @@ interface Props {
   onSearch: () => void
   onReset: () => void
   onCreate?: () => void
+  canSearch: boolean
 }
 
-const TagSearchForm = ({ form, onSearch, onReset, onCreate }: Props) => (
+const TagSearchForm = ({ form, onSearch, onReset, onCreate, canSearch }: Props) => (
   <Form form={form} onFinish={onSearch}>
     <Flex gap={24} wrap>
       <Form.Item name="name" label="标签名称">
@@ -27,9 +28,11 @@ const TagSearchForm = ({ form, onSearch, onReset, onCreate }: Props) => (
             新增标签
           </Button>
         )}
-        <Button type="primary" htmlType="submit">
-          查询
-        </Button>
+        {canSearch && (
+          <Button type="primary" htmlType="submit">
+            查询
+          </Button>
+        )}
         <Button onClick={onReset}>重置</Button>
       </Space>
     </Form.Item>

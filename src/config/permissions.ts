@@ -9,15 +9,29 @@ export const MENU_PERMISSIONS = {
 } as const
 
 export const BUTTON_PERMISSIONS = {
-  user: { create: 'user:create', view: 'user:view', edit: 'user:edit', delete: 'user:delete' },
-  role: { create: 'role:create', view: 'role:view', edit: 'role:edit', delete: 'role:delete' },
+  user: {
+    list: 'user:list',
+    create: 'user:create',
+    view: 'user:view',
+    edit: 'user:edit',
+    delete: 'user:delete',
+  },
+  role: {
+    list: 'role:list',
+    create: 'role:create',
+    view: 'role:view',
+    edit: 'role:edit',
+    delete: 'role:delete',
+  },
   access: {
+    list: 'access:list',
     create: 'access:create',
     view: 'access:view',
     edit: 'access:edit',
     delete: 'access:delete',
   },
   article: {
+    list: 'article:list',
     create: 'article:create',
     view: 'article:view',
     edit: 'article:edit',
@@ -28,12 +42,19 @@ export const BUTTON_PERMISSIONS = {
     status: 'article:status',
   },
   category: {
+    list: 'category:list',
     create: 'category:create',
     view: 'category:view',
     edit: 'category:edit',
     delete: 'category:delete',
   },
-  tag: { create: 'tag:create', view: 'tag:view', edit: 'tag:edit', delete: 'tag:delete' },
+  tag: {
+    list: 'tag:list',
+    create: 'tag:create',
+    view: 'tag:view',
+    edit: 'tag:edit',
+    delete: 'tag:delete',
+  },
 } as const
 
 export const getMenuPermission = (pathname: string) =>

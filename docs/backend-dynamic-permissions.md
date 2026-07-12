@@ -16,12 +16,12 @@
 
 按钮资源：
 
-- 用户：`user:create`、`user:view`、`user:edit`、`user:delete`
-- 角色：`role:create`、`role:view`、`role:edit`、`role:delete`
-- 资源：`access:create`、`access:view`、`access:edit`、`access:delete`
-- 文章：`article:create`、`article:view`、`article:edit`、`article:delete`、`article:submit`、`article:withdraw`、`article:approve`、`article:status`
-- 分类：`category:create`、`category:view`、`category:edit`、`category:delete`
-- 标签：`tag:create`、`tag:view`、`tag:edit`、`tag:delete`
+- 用户：`user:list`、`user:create`、`user:view`、`user:edit`、`user:delete`
+- 角色：`role:list`、`role:create`、`role:view`、`role:edit`、`role:delete`
+- 资源：`access:list`、`access:create`、`access:view`、`access:edit`、`access:delete`
+- 文章：`article:list`、`article:create`、`article:view`、`article:edit`、`article:delete`、`article:submit`、`article:withdraw`、`article:approve`、`article:status`
+- 分类：`category:list`、`category:create`、`category:view`、`category:edit`、`category:delete`
+- 标签：`tag:list`、`tag:create`、`tag:view`、`tag:edit`、`tag:delete`
 
 按钮资源应使用 `feature` 类型，并挂到对应的 `menu` 资源下。请通过数据库迁移或种子数据幂等创建以上资源，避免重复插入。
 

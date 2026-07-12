@@ -9,9 +9,16 @@ interface AccessSearchFormProps {
   onSearch: () => void
   onReset: () => void
   onCreate?: () => void
+  canSearch: boolean
 }
 
-const AccessSearchForm = ({ form, onSearch, onReset, onCreate }: AccessSearchFormProps) => (
+const AccessSearchForm = ({
+  form,
+  onSearch,
+  onReset,
+  onCreate,
+  canSearch,
+}: AccessSearchFormProps) => (
   <Form form={form} onFinish={onSearch} size={'medium'}>
     <Flex gap={32} wrap>
       <Form.Item name="description" label="资源名称">
@@ -32,9 +39,11 @@ const AccessSearchForm = ({ form, onSearch, onReset, onCreate }: AccessSearchFor
             新增资源
           </Button>
         )}
-        <Button type="primary" htmlType="submit">
-          查询
-        </Button>
+        {canSearch && (
+          <Button type="primary" htmlType="submit">
+            查询
+          </Button>
+        )}
         <Button onClick={onReset}>重置</Button>
       </Space>
     </Form.Item>

@@ -12,6 +12,7 @@ interface Props {
   onCreate?: () => void
   categoryTreeData: TreeSelectProps['treeData']
   showApprovalFilter?: boolean
+  canSearch: boolean
 }
 
 const ArticleSearchForm = ({
@@ -21,6 +22,7 @@ const ArticleSearchForm = ({
   onCreate,
   categoryTreeData,
   showApprovalFilter = true,
+  canSearch,
 }: Props) => (
   <Form form={form} onFinish={onSearch}>
     <Flex gap={24} wrap>
@@ -73,9 +75,11 @@ const ArticleSearchForm = ({
             新增文章
           </Button>
         )}
-        <Button type="primary" htmlType="submit">
-          查询
-        </Button>
+        {canSearch && (
+          <Button type="primary" htmlType="submit">
+            查询
+          </Button>
+        )}
         <Button onClick={onReset}>重置</Button>
       </Space>
     </Form.Item>

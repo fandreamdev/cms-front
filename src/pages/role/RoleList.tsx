@@ -149,6 +149,7 @@ const RoleListPage = () => {
           onSearch={handleSearch}
           onReset={handleReset}
           onCreate={can(BUTTON_PERMISSIONS.role.create) ? openCreate : undefined}
+          canSearch={can(BUTTON_PERMISSIONS.role.list)}
         />
       </Card>
 

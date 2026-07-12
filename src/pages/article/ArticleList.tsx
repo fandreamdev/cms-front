@@ -60,6 +60,7 @@ const ArticleListPage = ({ reviewMode = false }: ArticleListPageProps) => {
           form={searchForm}
           categoryTreeData={toCategoryTreeData(categories)}
           showApprovalFilter={!reviewMode}
+          canSearch={hasPermission(user, BUTTON_PERMISSIONS.article.list)}
           onSearch={() =>
             setQuery((prev) => ({
               ...prev,

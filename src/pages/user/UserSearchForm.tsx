@@ -9,9 +9,10 @@ interface UserSearchFormProps {
   onSearch: () => void
   onReset: () => void
   onCreate?: () => void
+  canSearch: boolean
 }
 
-const UserSearchForm = ({ form, onSearch, onReset, onCreate }: UserSearchFormProps) => (
+const UserSearchForm = ({ form, onSearch, onReset, onCreate, canSearch }: UserSearchFormProps) => (
   <Form form={form} onFinish={onSearch}>
     <Flex gap={32} wrap>
       <Form.Item name="username" label="用户名">
@@ -37,9 +38,11 @@ const UserSearchForm = ({ form, onSearch, onReset, onCreate }: UserSearchFormPro
             新增用户
           </Button>
         )}
-        <Button type="primary" htmlType="submit">
-          查询
-        </Button>
+        {canSearch && (
+          <Button type="primary" htmlType="submit">
+            查询
+          </Button>
+        )}
         <Button onClick={onReset}>重置</Button>
       </Space>
     </Form.Item>

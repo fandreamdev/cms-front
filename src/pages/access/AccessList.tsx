@@ -126,6 +126,7 @@ const AccessListPage = () => {
           onSearch={handleSearch}
           onReset={handleReset}
           onCreate={can(BUTTON_PERMISSIONS.access.create) ? openCreate : undefined}
+          canSearch={can(BUTTON_PERMISSIONS.access.list)}
         />
       </Card>
 

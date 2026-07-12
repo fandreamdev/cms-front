@@ -101,6 +101,7 @@ const TagListPage = () => {
             setQuery(initialQuery)
           }}
           onCreate={can(BUTTON_PERMISSIONS.tag.create) ? openCreate : undefined}
+          canSearch={can(BUTTON_PERMISSIONS.tag.list)}
         />
       </Card>
       <Card style={{ flex: 1, minHeight: 0 }} styles={{ body: { height: '100%' } }}>
