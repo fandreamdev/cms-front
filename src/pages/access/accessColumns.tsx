@@ -47,22 +47,22 @@ export function createAccessColumns({
       fixed: 'right',
       render: (_, record) => (
         <Space>
-          <Button type='link' size='small' onClick={() => onView(record.id)}>
+          <Button type="link" size="small" onClick={() => onView(record.id)}>
             查看
           </Button>
-          <Button type='link' size='small' onClick={() => onEdit(record)}>
+          <Button type="link" size="small" onClick={() => onEdit(record)}>
             编辑
           </Button>
           <Popconfirm
-            title='确定删除该资源吗？'
+            title="确定删除该资源吗？"
             description={
               record.children?.length ? '该资源包含下级资源，请确认后端是否允许删除。' : undefined
             }
             onConfirm={() => onDelete(record.id)}
-            okText='确定'
-            cancelText='取消'
+            okText="确定"
+            cancelText="取消"
           >
-            <Button type='link' size='small' danger>
+            <Button type="link" size="small" danger>
               删除
             </Button>
           </Popconfirm>

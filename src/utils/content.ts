@@ -9,17 +9,13 @@ export const detectContentMode = (content: string): ContentMode =>
     ? 'rich'
     : 'markdown'
 
-export const markdownToHtml = (markdown: string) =>
-  DOMPurify.sanitize(marked.parse(markdown, { async: false }))
-
 export const htmlToMarkdown = (html: string) => {
   const turndown = new TurndownService({ headingStyle: 'atx', bulletListMarker: '-' })
   return turndown.turndown(DOMPurify.sanitize(html))
 }
 
 export const renderContent = (content: string) => {
-  const html = detectContentMode(content) === 'markdown'
-    ? marked.parse(content, { async: false })
-    : content
+  const html =
+    detectContentMode(content) === 'markdown' ? marked.parse(content, { async: false }) : content
   return DOMPurify.sanitize(html)
 }

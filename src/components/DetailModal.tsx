@@ -1,7 +1,7 @@
 import { Descriptions, Modal, Skeleton } from 'antd'
 import type { ReactNode } from 'react'
 
-export interface DetailItem {
+interface DetailItem {
   label: ReactNode
   children: ReactNode
 }

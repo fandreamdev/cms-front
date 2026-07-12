@@ -49,7 +49,8 @@ const ArticleContentEditor = ({ value = '', onChange }: Props) => {
         change: () => {
           if (syncingExternalValueRef.current) return
           const markdown = editor.getMarkdown()
-          if (normalizeMarkdown(markdown) === normalizeMarkdown(toMarkdown(valueRef.current))) return
+          if (normalizeMarkdown(markdown) === normalizeMarkdown(toMarkdown(valueRef.current)))
+            return
           valueRef.current = markdown
           onChangeRef.current?.(markdown)
         },
@@ -62,9 +63,8 @@ const ArticleContentEditor = ({ value = '', onChange }: Props) => {
               return
             }
             try {
-              const file = blob instanceof File
-                ? blob
-                : new File([blob], '正文图片.png', { type: blob.type })
+              const file =
+                blob instanceof File ? blob : new File([blob], '正文图片.png', { type: blob.type })
               const result = await uploadImage(file)
               callback(resolveAssetUrl(result.url), file.name)
               message.success('正文图片上传成功')

@@ -30,28 +30,28 @@ const RoleFormModal = ({
     onOk={onOk}
     onCancel={onCancel}
     confirmLoading={submitting}
-    okText='确定'
-    cancelText='取消'
+    okText="确定"
+    cancelText="取消"
     destroyOnHidden
   >
-    <Form form={form} layout='vertical'>
+    <Form form={form} layout="vertical">
       <Form.Item
-        name='name'
-        label='角色名称'
+        name="name"
+        label="角色名称"
         rules={[{ required: true, message: '请输入角色名称' }]}
       >
-        <Input placeholder='请输入角色名称' allowClear />
+        <Input placeholder="请输入角色名称" allowClear />
       </Form.Item>
-      <Form.Item name='accessIds' label='资源'>
+      <Form.Item name="accessIds" label="资源">
         <TreeSelect
           treeCheckable
           showCheckedStrategy={TreeSelect.SHOW_ALL}
           allowClear
           loading={accessLoading}
           treeData={accessTreeData}
-          placeholder='请选择资源'
+          placeholder="请选择资源"
           treeDefaultExpandAll
-          maxTagCount='responsive'
+          maxTagCount="responsive"
         />
       </Form.Item>
     </Form>

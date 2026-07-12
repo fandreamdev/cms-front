@@ -8,7 +8,11 @@ interface UserColumnsOptions {
   onDelete: (id: number) => void
 }
 
-export function createUserColumns({ onView, onEdit, onDelete }: UserColumnsOptions): ColumnsType<User> {
+export function createUserColumns({
+  onView,
+  onEdit,
+  onDelete,
+}: UserColumnsOptions): ColumnsType<User> {
   return [
     { title: 'ID', dataIndex: 'id', width: 70 },
     { title: '用户名', dataIndex: 'username' },
@@ -19,13 +23,13 @@ export function createUserColumns({ onView, onEdit, onDelete }: UserColumnsOptio
       dataIndex: 'status',
       width: 90,
       render: (value: number) =>
-        value === 1 ? <Tag color='success'>启用</Tag> : <Tag color='error'>禁用</Tag>,
+        value === 1 ? <Tag color="success">启用</Tag> : <Tag color="error">禁用</Tag>,
     },
     {
       title: '超管',
       dataIndex: 'isSuper',
       width: 90,
-      render: (value: number) => (value === 1 ? <Tag color='gold'>是</Tag> : <Tag>否</Tag>),
+      render: (value: number) => (value === 1 ? <Tag color="gold">是</Tag> : <Tag>否</Tag>),
     },
     { title: '排序', dataIndex: 'sort', width: 90 },
     {
@@ -41,19 +45,19 @@ export function createUserColumns({ onView, onEdit, onDelete }: UserColumnsOptio
       fixed: 'right',
       render: (_, record) => (
         <Space>
-          <Button type='link' size='small' onClick={() => onView(record.id)}>
+          <Button type="link" size="small" onClick={() => onView(record.id)}>
             查看
           </Button>
-          <Button type='link' size='small' onClick={() => onEdit(record)}>
+          <Button type="link" size="small" onClick={() => onEdit(record)}>
             编辑
           </Button>
           <Popconfirm
-            title='确定删除该用户吗？'
+            title="确定删除该用户吗？"
             onConfirm={() => onDelete(record.id)}
-            okText='确定'
-            cancelText='取消'
+            okText="确定"
+            cancelText="取消"
           >
-            <Button type='link' size='small' danger>
+            <Button type="link" size="small" danger>
               删除
             </Button>
           </Popconfirm>

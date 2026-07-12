@@ -6,7 +6,7 @@ export function flattenAccessTree(nodes: AccessTree[]): AccessTree[] {
   return nodes.flatMap((node) => [node, ...flattenAccessTree(node.children ?? [])])
 }
 
-export function getDescendantIds(recordId: number, nodes: AccessTree[]) {
+function getDescendantIds(recordId: number, nodes: AccessTree[]) {
   const ids = new Set<number>()
 
   const collect = (items: AccessTree[]) => {

@@ -33,19 +33,19 @@ const AccessFormModal = ({
     onOk={onOk}
     onCancel={onCancel}
     confirmLoading={submitting}
-    okText='确定'
-    cancelText='取消'
+    okText="确定"
+    cancelText="取消"
     destroyOnHidden
   >
-    <Form form={form} layout='vertical'>
+    <Form form={form} layout="vertical">
       <Form.Item
-        name='description'
-        label='资源名称'
+        name="description"
+        label="资源名称"
         rules={[{ required: true, message: '请输入资源名称' }]}
       >
-        <Input placeholder='请输入资源名称' allowClear />
+        <Input placeholder="请输入资源名称" allowClear />
       </Form.Item>
-      <Form.Item name='type' label='类型' rules={[{ required: true, message: '请选择类型' }]}>
+      <Form.Item name="type" label="类型" rules={[{ required: true, message: '请选择类型' }]}>
         <Select
           options={typeOptions}
           onChange={(value: AccessType) => {
@@ -61,15 +61,15 @@ const AccessFormModal = ({
         />
       </Form.Item>
       <Form.Item
-        name='url'
-        label='资源标识'
+        name="url"
+        label="资源标识"
         rules={[{ required: true, message: '请输入资源标识' }]}
       >
-        <Input placeholder='菜单填路由路径，功能填权限标识，例如 menu:add' allowClear />
+        <Input placeholder="菜单填路由路径，功能填权限标识，例如 menu:add" allowClear />
       </Form.Item>
       <Form.Item
-        name='parentId'
-        label='上级资源'
+        name="parentId"
+        label="上级资源"
         rules={[
           { required: true, message: '请选择上级资源' },
           {
