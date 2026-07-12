@@ -1,5 +1,6 @@
 import type { MenuProps } from 'antd'
 import {
+  AuditOutlined,
   FileTextOutlined,
   FolderOutlined,
   HomeOutlined,
@@ -17,6 +18,12 @@ export const menuItems: MenuItem[] = [
     label: '首页',
   },
 
+  {
+    key: '/admin/reviews',
+    icon: <AuditOutlined />,
+    label: '审批管理',
+    children: [{ key: '/admin/reviews/articles', label: '文章审批', icon: <AuditOutlined /> }],
+  },
   {
     key: '/admin/system',
     icon: <SettingOutlined />,

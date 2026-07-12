@@ -3,13 +3,28 @@ import type { Category } from './category'
 import type { Tag } from './tag'
 import type { PagedResult } from './types'
 
+export type ArticleApprovalStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'withdrawn'
+
+interface ArticleUser {
+  id: number
+  username: string
+}
+
 export interface Article {
   id: number
   title: string
   summary: string | null
   content: string
   coverUrl: string | null
-  status: number
+  status: 0 | 1
+  approvalStatus: ArticleApprovalStatus
+  rejectionReason: string | null
+  submittedAt: string | null
+  reviewedAt: string | null
+  authorId: number | null
+  author: ArticleUser | null
+  reviewerId: number | null
+  reviewer: ArticleUser | null
   publishedAt: string | null
   sort: number
   createdAt: string
@@ -25,6 +40,7 @@ export interface ArticleQuery {
   summary?: string
   status?: number | ''
   categoryId?: number
+  approvalStatus?: ArticleApprovalStatus
   page?: number
   pageSize?: number
 }
@@ -34,8 +50,6 @@ export interface ArticlePayload {
   summary?: string | null
   coverUrl?: string | null
   content: string
-  status?: number
-  publishedAt?: string | null
   sort?: number
   categoryId: number
   tagIds?: number[]
@@ -60,3 +74,18 @@ export function updateArticle(id: number, data: ArticlePayload) {
 export function deleteArticle(id: number) {
   return request<null>(`/articles/${id}`, { method: 'DELETE' })
 }
+
+export const submitArticle = (id: number) =>
+  request<Article>(`/articles/${id}/submit`, { method: 'POST' })
+
+export const approveArticle = (id: number) =>
+  request<Article>(`/articles/${id}/approve`, { method: 'POST' })
+
+export const rejectArticle = (id: number, reason: string) =>
+  request<Article>(`/articles/${id}/reject`, { method: 'POST', body: { reason } })
+
+export const withdrawArticle = (id: number) =>
+  request<Article>(`/articles/${id}/withdraw`, { method: 'POST' })
+
+export const updateArticleStatus = (id: number, status: 0 | 1) =>
+  request<Article>(`/articles/${id}/status`, { method: 'PUT', body: { status } })

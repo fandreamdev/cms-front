@@ -6,7 +6,8 @@ import {
   MenuUnfoldOutlined,
   UserOutlined,
 } from '@ant-design/icons'
-import { useNavigate } from 'react-router'
+import { useNavigate } from '@tanstack/react-router'
+import { useAuth } from '../../contexts/authContextValue'
 
 interface AppHeaderProps {
   toggleCollapsed: () => void
@@ -15,12 +16,11 @@ interface AppHeaderProps {
 
 const AppHeader = ({ toggleCollapsed, collapsed }: AppHeaderProps) => {
   const navigate = useNavigate()
+  const { user, logout } = useAuth()
 
   const handleLogout = () => {
-    // 清除登录态（token / 用户信息）
-    localStorage.removeItem('token')
-    localStorage.removeItem('userInfo')
-    navigate('/login')
+    logout()
+    navigate({ to: '/login' })
   }
 
   const items: MenuProps['items'] = [
@@ -43,14 +43,14 @@ const AppHeader = ({ toggleCollapsed, collapsed }: AppHeaderProps) => {
         justifyContent: 'space-between',
       }}
     >
-      <Button type='text' onClick={toggleCollapsed}>
+      <Button type="text" onClick={toggleCollapsed}>
         {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
       </Button>
 
-      <Dropdown menu={{ items }} placement='bottomRight'>
+      <Dropdown menu={{ items }} placement="bottomRight">
         <Space style={{ cursor: 'pointer' }}>
-          <Avatar size='small' icon={<UserOutlined />} />
-          <span>欢迎，管理员</span>
+          <Avatar size="small" icon={<UserOutlined />} />
+          <span>欢迎，{user?.username ?? '-'}</span>
           <DownOutlined style={{ fontSize: 12 }} />
         </Space>
       </Dropdown>
