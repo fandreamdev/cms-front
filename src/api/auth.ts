@@ -19,6 +19,7 @@ export interface LoginPayload {
 
 export interface LoginResult {
   accessToken: string
+  refreshToken: string
   user: CurrentUser
 }
 
