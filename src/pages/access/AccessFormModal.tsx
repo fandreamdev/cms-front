@@ -35,7 +35,7 @@ const AccessFormModal = ({
     confirmLoading={submitting}
     okText="确定"
     cancelText="取消"
-    destroyOnHidden
+    forceRender
   >
     <Form form={form} layout="vertical">
       <Form.Item
