@@ -28,7 +28,7 @@ const AppSider = ({ collapsed }: AppSiderProps) => {
     .split('/')
     .slice(1, -1)
     .map((_, index, segments) => `/${segments.slice(0, index + 1).join('/')}`)
-
+  const selectedKey = pathname.endsWith('/') ? pathname.slice(0, -1) : pathname
   return (
     <Layout.Sider theme="dark" collapsed={collapsed}>
       <AppLogo collapsed={collapsed} />
@@ -36,7 +36,7 @@ const AppSider = ({ collapsed }: AppSiderProps) => {
         mode="inline"
         theme="dark"
         items={filterMenus(menuItems) as MenuProps['items']}
-        selectedKeys={[pathname]}
+        selectedKeys={[selectedKey]}
         defaultOpenKeys={defaultOpenKeys}
         onClick={({ key }) => navigate({ to: key as never })}
       />
