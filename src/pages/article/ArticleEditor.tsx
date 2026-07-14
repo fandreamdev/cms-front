@@ -57,9 +57,10 @@ const ArticleEditorPage = () => {
         if (article) {
           if (
             article.authorId !== user?.id ||
-            !['draft', 'approved', 'rejected'].includes(article.approvalStatus)
+            article.approvalStatus === 'pending' ||
+            article.status === 0
           ) {
-            message.error('当前文章状态不允许编辑')
+            message.error('审批中或已下架的文章不能编辑')
             navigate({ to: '/admin/content/articles', replace: true })
             return
           }

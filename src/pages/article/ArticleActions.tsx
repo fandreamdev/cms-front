@@ -26,8 +26,8 @@ const ArticleActions = ({ article, reviewMode, onDelete }: Props) => {
   const queryClient = useQueryClient()
   const { user } = useAuth()
   const isAuthor = article.authorId === user?.id
-  const editable = isAuthor && ['draft', 'approved', 'rejected'].includes(article.approvalStatus)
   const pending = article.approvalStatus === 'pending'
+  const editable = isAuthor && !pending && article.status !== 0
   const can = (permission: string) => hasPermission(user, permission)
 
   const runAction = async (action: () => Promise<unknown>, successMessage: string) => {
@@ -98,7 +98,7 @@ const ArticleActions = ({ article, reviewMode, onDelete }: Props) => {
       )}
       {!reviewMode && isAuthor && pending && can(BUTTON_PERMISSIONS.article.withdraw) && (
         <Popconfirm
-          title="撤回后文章将不能继续编辑或重新提交，是否继续？"
+          title="撤回后文章可重新编辑并再次提交，是否继续？"
           onConfirm={() => runAction(() => withdrawArticle(article.id), '撤回成功')}
           okText="撤回"
           cancelText="取消"
