@@ -58,20 +58,25 @@ const ArticleDetailPage = ({ reviewMode = false }: ArticleDetailPageProps) => {
             >
               返回列表
             </Button>
-            {!reviewMode && article && hasPermission(user, BUTTON_PERMISSIONS.article.edit) && (
-              <Button
-                type="primary"
-                icon={<EditOutlined />}
-                onClick={() =>
-                  navigate({
-                    to: '/admin/content/articles/$id/edit',
-                    params: { id: String(article.id) },
-                  })
-                }
-              >
-                编辑
-              </Button>
-            )}
+            {!reviewMode &&
+              article &&
+              article.status !== 0 &&
+              article.approvalStatus !== 'pending' &&
+              article.authorId === user?.id &&
+              hasPermission(user, BUTTON_PERMISSIONS.article.edit) && (
+                <Button
+                  type="primary"
+                  icon={<EditOutlined />}
+                  onClick={() =>
+                    navigate({
+                      to: '/admin/content/articles/$id/edit',
+                      params: { id: String(article.id) },
+                    })
+                  }
+                >
+                  编辑
+                </Button>
+              )}
           </Space>
         }
       >

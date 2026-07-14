@@ -41,6 +41,21 @@ const ArticleActions = ({ article, reviewMode, onDelete }: Props) => {
     }
   }
 
+  if (article.status === 0)
+    return (
+      <Space>
+        {!reviewMode && can(BUTTON_PERMISSIONS.article.status) && (
+          <Button
+            type="link"
+            size="small"
+            onClick={() => runAction(() => updateArticleStatus(article.id, 1), '上架成功')}
+          >
+            上架
+          </Button>
+        )}
+      </Space>
+    )
+
   const reject = () => {
     let reason = ''
     Modal.confirm({
