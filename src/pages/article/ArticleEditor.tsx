@@ -3,13 +3,7 @@ import { ArrowLeftOutlined, SaveOutlined } from '@ant-design/icons'
 import { Button, Card, Form, Space, Spin, Upload, message } from 'antd'
 import type { UploadProps } from 'antd'
 import { useNavigate, useParams } from '@tanstack/react-router'
-import {
-  createArticle,
-  getArticle,
-  updateArticle,
-  type Article,
-  type ArticlePayload,
-} from '../../api/article'
+import { createArticle, getArticle, updateArticle, type ArticlePayload } from '../../api/article'
 import { getCategoryTree, type Category } from '../../api/category'
 import { getTagList, type Tag } from '../../api/tag'
 import { uploadImage } from '../../api/upload'
@@ -18,6 +12,7 @@ import { useAuth } from '../../contexts/authContextValue'
 import { useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '../../app/queryKeys'
 import ArticleEditorForm from './ArticleEditorForm'
+import { getArticleCapabilities } from './articlePolicy'
 
 const ArticleEditorPage = () => {
   const { id } = useParams({ strict: false }) as { id?: string }
@@ -32,7 +27,6 @@ const ArticleEditorPage = () => {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [coverUploading, setCoverUploading] = useState(false)
-  const [article, setArticle] = useState<Article | null>(null)
   const coverUrl = Form.useWatch('coverUrl', form)
 
   useEffect(() => {
@@ -55,16 +49,11 @@ const ArticleEditorPage = () => {
         setCategories(categoryTree)
         setTags(tagResult.list)
         if (article) {
-          if (
-            article.authorId !== user?.id ||
-            article.approvalStatus === 'pending' ||
-            article.status === 0
-          ) {
+          if (!getArticleCapabilities(article, user).canEdit) {
             message.error('审批中或已下架的文章不能编辑')
             navigate({ to: '/admin/content/articles', replace: true })
             return
           }
-          setArticle(article)
           form.setFieldsValue({
             title: article.title,
             summary: article.summary,
@@ -84,7 +73,7 @@ const ArticleEditorPage = () => {
       }
     }
     load()
-  }, [articleId, form, navigate, queryClient, user?.id])
+  }, [articleId, form, navigate, queryClient, user])
 
   const handleSubmit = async () => {
     const values = await form.validateFields()
@@ -158,9 +147,7 @@ const ArticleEditorPage = () => {
               loading={submitting}
               onClick={handleSubmit}
             >
-              {article && ['approved', 'rejected'].includes(article.approvalStatus)
-                ? '提交审核'
-                : '保存'}
+              保存
             </Button>
           </Space>
         }

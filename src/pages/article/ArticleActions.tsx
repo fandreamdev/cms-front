@@ -9,11 +9,10 @@ import {
   withdrawArticle,
   type Article,
 } from '../../api/article'
-import { hasPermission } from '../../api/auth'
 import { queryKeys } from '../../app/queryKeys'
-import { BUTTON_PERMISSIONS } from '../../config/permissions'
 import { useAuth } from '../../contexts/authContextValue'
 import { HttpError } from '../../utils/request'
+import { getArticleCapabilities } from './articlePolicy'
 
 interface Props {
   article: Article
@@ -25,10 +24,7 @@ const ArticleActions = ({ article, reviewMode, onDelete }: Props) => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { user } = useAuth()
-  const isAuthor = article.authorId === user?.id
-  const pending = article.approvalStatus === 'pending'
-  const editable = isAuthor && !pending && article.status !== 0
-  const can = (permission: string) => hasPermission(user, permission)
+  const capabilities = getArticleCapabilities(article, user)
 
   const runAction = async (action: () => Promise<unknown>, successMessage: string) => {
     try {
@@ -41,10 +37,10 @@ const ArticleActions = ({ article, reviewMode, onDelete }: Props) => {
     }
   }
 
-  if (article.status === 0)
+  if (capabilities.isOffline)
     return (
       <Space>
-        {!reviewMode && can(BUTTON_PERMISSIONS.article.status) && (
+        {!reviewMode && capabilities.canChangeStatus && (
           <Button
             type="link"
             size="small"
@@ -85,7 +81,7 @@ const ArticleActions = ({ article, reviewMode, onDelete }: Props) => {
 
   return (
     <Space>
-      {!reviewMode && editable && can(BUTTON_PERMISSIONS.article.edit) && (
+      {!reviewMode && capabilities.canEdit && (
         <Button
           type="link"
           size="small"
@@ -99,7 +95,7 @@ const ArticleActions = ({ article, reviewMode, onDelete }: Props) => {
           编辑
         </Button>
       )}
-      {!reviewMode && editable && can(BUTTON_PERMISSIONS.article.submit) && (
+      {!reviewMode && capabilities.canSubmit && (
         <Popconfirm
           title="提交后文章将进入审批中，审批完成或撤回前不能继续编辑。"
           onConfirm={() => runAction(() => submitArticle(article.id), '提交审批成功')}
@@ -111,7 +107,7 @@ const ArticleActions = ({ article, reviewMode, onDelete }: Props) => {
           </Button>
         </Popconfirm>
       )}
-      {!reviewMode && isAuthor && pending && can(BUTTON_PERMISSIONS.article.withdraw) && (
+      {!reviewMode && capabilities.canWithdraw && (
         <Popconfirm
           title="撤回后文章可重新编辑并再次提交，是否继续？"
           onConfirm={() => runAction(() => withdrawArticle(article.id), '撤回成功')}
@@ -123,7 +119,7 @@ const ArticleActions = ({ article, reviewMode, onDelete }: Props) => {
           </Button>
         </Popconfirm>
       )}
-      {reviewMode && pending && can(BUTTON_PERMISSIONS.article.approve) && (
+      {reviewMode && capabilities.canReview && (
         <>
           <Popconfirm
             title="确定审核通过该文章吗？"
@@ -140,7 +136,7 @@ const ArticleActions = ({ article, reviewMode, onDelete }: Props) => {
           </Button>
         </>
       )}
-      {!reviewMode && can(BUTTON_PERMISSIONS.article.status) && (
+      {!reviewMode && capabilities.canChangeStatus && (
         <Button
           type="link"
           size="small"
@@ -154,21 +150,18 @@ const ArticleActions = ({ article, reviewMode, onDelete }: Props) => {
           {article.status === 1 ? '下架' : '上架'}
         </Button>
       )}
-      {!reviewMode &&
-        isAuthor &&
-        can(BUTTON_PERMISSIONS.article.delete) &&
-        ['draft', 'rejected'].includes(article.approvalStatus) && (
-          <Popconfirm
-            title="确定删除该文章吗？"
-            onConfirm={() => onDelete(article.id)}
-            okText="确定"
-            cancelText="取消"
-          >
-            <Button type="link" size="small" danger>
-              删除
-            </Button>
-          </Popconfirm>
-        )}
+      {!reviewMode && capabilities.canDelete && (
+        <Popconfirm
+          title="确定删除该文章吗？"
+          onConfirm={() => onDelete(article.id)}
+          okText="确定"
+          cancelText="取消"
+        >
+          <Button type="link" size="small" danger>
+            删除
+          </Button>
+        </Popconfirm>
+      )}
     </Space>
   )
 }

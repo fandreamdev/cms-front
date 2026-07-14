@@ -8,8 +8,7 @@ import { renderContent } from '../../utils/content'
 import { approvalStatusMap } from './approval'
 import { queryKeys } from '../../app/queryKeys'
 import { useAuth } from '../../contexts/authContextValue'
-import { hasPermission } from '../../api/auth'
-import { BUTTON_PERMISSIONS } from '../../config/permissions'
+import { getArticleCapabilities } from './articlePolicy'
 
 interface ArticleDetailPageProps {
   reviewMode?: boolean
@@ -58,25 +57,20 @@ const ArticleDetailPage = ({ reviewMode = false }: ArticleDetailPageProps) => {
             >
               返回列表
             </Button>
-            {!reviewMode &&
-              article &&
-              article.status !== 0 &&
-              article.approvalStatus !== 'pending' &&
-              article.authorId === user?.id &&
-              hasPermission(user, BUTTON_PERMISSIONS.article.edit) && (
-                <Button
-                  type="primary"
-                  icon={<EditOutlined />}
-                  onClick={() =>
-                    navigate({
-                      to: '/admin/content/articles/$id/edit',
-                      params: { id: String(article.id) },
-                    })
-                  }
-                >
-                  编辑
-                </Button>
-              )}
+            {!reviewMode && article && getArticleCapabilities(article, user).canEdit && (
+              <Button
+                type="primary"
+                icon={<EditOutlined />}
+                onClick={() =>
+                  navigate({
+                    to: '/admin/content/articles/$id/edit',
+                    params: { id: String(article.id) },
+                  })
+                }
+              >
+                编辑
+              </Button>
+            )}
           </Space>
         }
       >
@@ -87,7 +81,7 @@ const ArticleDetailPage = ({ reviewMode = false }: ArticleDetailPageProps) => {
             </Typography.Title>
             <Space wrap style={{ display: 'flex', justifyContent: 'center', marginBottom: 28 }}>
               <Tag color={article.status === 1 ? 'success' : 'default'}>
-                {article.status === 1 ? '有效' : '失效'}
+                {article.status === 1 ? '已上架' : '已下架'}
               </Tag>
               <Tag color={approvalStatusMap[article.approvalStatus].color}>
                 {approvalStatusMap[article.approvalStatus].text}

@@ -53,10 +53,11 @@ export const createArticleColumns = ({
       ),
   },
   {
-    title: '有效状态',
+    title: '上下架状态',
     dataIndex: 'status',
     width: 100,
-    render: (value: number) => (value === 1 ? <Tag color="success">有效</Tag> : <Tag>失效</Tag>),
+    render: (value: number) =>
+      value === 1 ? <Tag color="success">已上架</Tag> : <Tag>已下架</Tag>,
   },
   {
     title: '审批状态',

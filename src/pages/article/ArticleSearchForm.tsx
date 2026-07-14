@@ -38,8 +38,8 @@ const ArticleSearchForm = ({
           allowClear
           style={{ width: 140 }}
           options={[
-            { label: '失效', value: 0 },
-            { label: '有效', value: 1 },
+            { label: '已下架', value: 0 },
+            { label: '已上架', value: 1 },
           ]}
         />
       </Form.Item>
