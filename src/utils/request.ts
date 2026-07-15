@@ -20,6 +20,11 @@ interface RequestOptions extends Omit<RequestInit, 'body'> {
   skipAuth?: boolean
 }
 
+export interface BlobResponse {
+  blob: Blob
+  filename?: string
+}
+
 export class HttpError extends Error {
   status: number
 
@@ -87,10 +92,31 @@ function buildQuery(params?: Record<string, unknown>): string {
   return qs ? `?${qs}` : ''
 }
 
-async function request<T>(url: string, options: RequestOptions = {}): Promise<T> {
+function getFilename(contentDisposition: string | null): string | undefined {
+  if (!contentDisposition) return undefined
+
+  const utf8Match = contentDisposition.match(/filename\*\s*=\s*(?:"([^"]*)"|([^;]*))/i)
+  const utf8Value = (utf8Match?.[1] ?? utf8Match?.[2])?.trim()
+  if (utf8Value) {
+    const encodedFilename = utf8Value.match(/^UTF-8'[^']*'(.*)$/i)?.[1]
+    if (encodedFilename) {
+      try {
+        return decodeURIComponent(encodedFilename)
+      } catch {
+        // filename* 编码异常时继续尝试普通 filename
+      }
+    }
+  }
+
+  const filenameMatch = contentDisposition.match(/filename\s*=\s*(?:"([^"]*)"|([^;]*))/i)
+  return (filenameMatch?.[1] ?? filenameMatch?.[2])?.trim() || undefined
+}
+
+async function sendRequest(url: string, options: RequestOptions): Promise<Response> {
   const { params, body, headers, skipAuth, ...rest } = options
   const isFormData = body instanceof FormData
-  const send = async (retried = false): Promise<T> => {
+
+  const send = async (retried = false): Promise<Response> => {
     const token = skipAuth ? null : getAccessToken()
     let res: Response
     try {
@@ -132,16 +158,32 @@ async function request<T>(url: string, options: RequestOptions = {}): Promise<T>
       throw new HttpError(res.status, errorMessage)
     }
 
-    const json = (await res.json()) as ApiResponse<T>
-    if (json.code !== 0) {
-      message.error(json.message || '操作失败')
-      throw new Error(json.message)
-    }
-
-    return json.data
+    return res
   }
 
   return send()
+}
+
+async function request<T>(url: string, options: RequestOptions = {}): Promise<T> {
+  const res = await sendRequest(url, options)
+  const json = (await res.json()) as ApiResponse<T>
+  if (json.code !== 0) {
+    message.error(json.message || '操作失败')
+    throw new Error(json.message)
+  }
+
+  return json.data
+}
+
+export async function requestBlob(
+  url: string,
+  options: RequestOptions = {},
+): Promise<BlobResponse> {
+  const res = await sendRequest(url, options)
+  return {
+    blob: await res.blob(),
+    filename: getFilename(res.headers.get('Content-Disposition')),
+  }
 }
 
 export default request

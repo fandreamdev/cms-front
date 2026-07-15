@@ -1,4 +1,4 @@
-import request from '../utils/request'
+import request, { requestBlob } from '../utils/request'
 import type { Category } from './category'
 import type { Tag } from './tag'
 import type { PagedResult } from './types'
@@ -89,3 +89,8 @@ export const withdrawArticle = (id: number) =>
 
 export const updateArticleStatus = (id: number, status: 0 | 1) =>
   request<Article>(`/articles/${id}/status`, { method: 'PUT', body: { status } })
+
+export type ArticleExportFormat = 'word' | 'pdf'
+
+export const exportArticle = (id: number, format: ArticleExportFormat) =>
+  requestBlob(`/articles/${id}/export`, { params: { format } })

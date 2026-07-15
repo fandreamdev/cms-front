@@ -1,14 +1,27 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowLeftOutlined, EditOutlined } from '@ant-design/icons'
-import { Button, Card, Descriptions, Space, Spin, Tag, Typography } from 'antd'
+import {
+  ArrowLeftOutlined,
+  EditOutlined,
+  FilePdfOutlined,
+  FileWordOutlined,
+} from '@ant-design/icons'
+import { Button, Card, Descriptions, message, Space, Spin, Tag, Typography } from 'antd'
 import { useNavigate, useParams } from '@tanstack/react-router'
-import { getArticle, type Article } from '../../api/article'
+import {
+  exportArticle,
+  getArticle,
+  type Article,
+  type ArticleExportFormat,
+} from '../../api/article'
 import { renderContent } from '../../utils/content'
 import { approvalStatusMap } from './approval'
 import { queryKeys } from '../../app/queryKeys'
 import { useAuth } from '../../contexts/authContextValue'
 import { getArticleCapabilities } from './articlePolicy'
+import { hasPermission } from '../../api/auth'
+import { BUTTON_PERMISSIONS } from '../../config/permissions'
+import { downloadBlob } from '../../utils/download'
 
 interface ArticleDetailPageProps {
   reviewMode?: boolean
@@ -19,6 +32,7 @@ const ArticleDetailPage = ({ reviewMode = false }: ArticleDetailPageProps) => {
   const articleId = Number(id)
   const navigate = useNavigate()
   const { user } = useAuth()
+  const [exporting, setExporting] = useState<ArticleExportFormat | null>(null)
   const {
     data: article,
     isFetching: loading,
@@ -29,6 +43,23 @@ const ArticleDetailPage = ({ reviewMode = false }: ArticleDetailPageProps) => {
     enabled: Number.isInteger(articleId) && articleId > 0,
   })
   const safeContent = useMemo(() => renderContent(article?.content ?? ''), [article?.content])
+  const canExport = hasPermission(user, BUTTON_PERMISSIONS.article.view)
+
+  const handleExport = async (format: ArticleExportFormat) => {
+    if (!article || exporting) return
+
+    setExporting(format)
+    try {
+      const { blob, filename } = await exportArticle(article.id, format)
+      const extension = format === 'word' ? 'docx' : 'pdf'
+      downloadBlob(blob, filename, `${article.title}.${extension}`)
+      message.success(`已导出 ${format === 'word' ? 'Word' : 'PDF'}`)
+    } catch {
+      // 请求层已统一展示错误信息
+    } finally {
+      setExporting(null)
+    }
+  }
 
   useEffect(() => {
     if (!Number.isInteger(articleId) || articleId <= 0) {
@@ -57,6 +88,26 @@ const ArticleDetailPage = ({ reviewMode = false }: ArticleDetailPageProps) => {
             >
               返回列表
             </Button>
+            {article && canExport && (
+              <>
+                <Button
+                  icon={<FileWordOutlined />}
+                  loading={exporting === 'word'}
+                  disabled={exporting !== null && exporting !== 'word'}
+                  onClick={() => void handleExport('word')}
+                >
+                  导出 Word
+                </Button>
+                <Button
+                  icon={<FilePdfOutlined />}
+                  loading={exporting === 'pdf'}
+                  disabled={exporting !== null && exporting !== 'pdf'}
+                  onClick={() => void handleExport('pdf')}
+                >
+                  导出 PDF
+                </Button>
+              </>
+            )}
             {!reviewMode && article && getArticleCapabilities(article, user).canEdit && (
               <Button
                 type="primary"
