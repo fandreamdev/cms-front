@@ -1,4 +1,4 @@
-import { PlusOutlined } from '@ant-design/icons'
+import { FileExcelOutlined, FilePptOutlined, PlusOutlined } from '@ant-design/icons'
 import { Button, Flex, Form, Input, Select, Space, TreeSelect } from 'antd'
 import type { FormInstance } from 'antd'
 import type { TreeSelectProps } from 'antd'
@@ -10,6 +10,9 @@ interface Props {
   onSearch: () => void
   onReset: () => void
   onCreate?: () => void
+  onExportPpt?: () => void
+  onExportExcel?: () => void
+  exporting?: 'ppt' | 'excel' | null
   categoryTreeData: TreeSelectProps['treeData']
   showApprovalFilter?: boolean
   canSearch: boolean
@@ -20,6 +23,9 @@ const ArticleSearchForm = ({
   onSearch,
   onReset,
   onCreate,
+  onExportPpt,
+  onExportExcel,
+  exporting = null,
   categoryTreeData,
   showApprovalFilter = true,
   canSearch,
@@ -73,6 +79,26 @@ const ArticleSearchForm = ({
         {onCreate && (
           <Button type="primary" icon={<PlusOutlined />} onClick={onCreate}>
             新增文章
+          </Button>
+        )}
+        {onExportPpt && (
+          <Button
+            icon={<FilePptOutlined />}
+            loading={exporting === 'ppt'}
+            disabled={exporting !== null && exporting !== 'ppt'}
+            onClick={onExportPpt}
+          >
+            导出全部 PPT
+          </Button>
+        )}
+        {onExportExcel && (
+          <Button
+            icon={<FileExcelOutlined />}
+            loading={exporting === 'excel'}
+            disabled={exporting !== null && exporting !== 'excel'}
+            onClick={onExportExcel}
+          >
+            导出全部 Excel
           </Button>
         )}
         {canSearch && (

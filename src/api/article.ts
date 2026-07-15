@@ -94,3 +94,8 @@ export type ArticleExportFormat = 'word' | 'pdf'
 
 export const exportArticle = (id: number, format: ArticleExportFormat) =>
   requestBlob(`/articles/${id}/export`, { params: { format } })
+
+export type ArticleListExportFormat = 'ppt' | 'excel'
+
+export const exportAllArticles = (format: ArticleListExportFormat) =>
+  requestBlob('/articles/export', { params: { format } })

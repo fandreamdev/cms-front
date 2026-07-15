@@ -1,7 +1,15 @@
+import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Card, Form, Table, message } from 'antd'
 import type { TreeSelectProps } from 'antd'
-import { deleteArticle, getArticleList, type Article, type ArticleQuery } from '../../api/article'
+import {
+  deleteArticle,
+  exportAllArticles,
+  getArticleList,
+  type Article,
+  type ArticleListExportFormat,
+  type ArticleQuery,
+} from '../../api/article'
 import { useNavigate } from '@tanstack/react-router'
 import { usePagedQuery } from '../../shared/hooks/usePagedQuery'
 import { useTableScrollY } from '../../shared/hooks/useTableScrollY'
@@ -13,6 +21,7 @@ import { useAuth } from '../../contexts/authContextValue'
 import { queryKeys } from '../../app/queryKeys'
 import { BUTTON_PERMISSIONS, MENU_PERMISSIONS } from '../../config/permissions'
 import ArticleActions from './ArticleActions'
+import { downloadBlob } from '../../utils/download'
 
 const articleInitialQuery: ArticleQuery = { page: 1, pageSize: 10 }
 const reviewInitialQuery: ArticleQuery = { page: 1, pageSize: 10, approvalStatus: 'pending' }
@@ -33,6 +42,7 @@ const ArticleListPage = ({ reviewMode = false }: ArticleListPageProps) => {
   const [searchForm] = Form.useForm<ArticleQuery>()
   const navigate = useNavigate()
   const { user } = useAuth()
+  const [exporting, setExporting] = useState<ArticleListExportFormat | null>(null)
   const queryClient = useQueryClient()
   const { data, total, loading, query, setQuery } = usePagedQuery(
     initialQuery,
@@ -52,6 +62,24 @@ const ArticleListPage = ({ reviewMode = false }: ArticleListPageProps) => {
       setQuery((prev) => ({ ...prev, page: (prev.page ?? 1) - 1 }))
     else queryClient.invalidateQueries({ queryKey: queryKeys.articles.all })
   }
+
+  const handleExport = async (format: ArticleListExportFormat) => {
+    if (exporting) return
+
+    setExporting(format)
+    try {
+      const { blob, filename } = await exportAllArticles(format)
+      const extension = format === 'ppt' ? 'pptx' : 'xlsx'
+      downloadBlob(blob, filename, `全部文章.${extension}`)
+      message.success(`已导出全部文章 ${format === 'ppt' ? 'PPT' : 'Excel'}`)
+    } catch {
+      // 请求层已统一展示错误信息
+    } finally {
+      setExporting(null)
+    }
+  }
+
+  const canExportAll = !reviewMode && hasPermission(user, BUTTON_PERMISSIONS.article.list)
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16, height: '100%' }}>
@@ -81,6 +109,9 @@ const ArticleListPage = ({ reviewMode = false }: ArticleListPageProps) => {
               ? () => navigate({ to: '/admin/content/articles/new' })
               : undefined
           }
+          onExportPpt={canExportAll ? () => void handleExport('ppt') : undefined}
+          onExportExcel={canExportAll ? () => void handleExport('excel') : undefined}
+          exporting={exporting}
         />
       </Card>
       <Card style={{ flex: 1, minHeight: 0 }} styles={{ body: { height: '100%' } }}>
