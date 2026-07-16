@@ -58,6 +58,12 @@ export const menuItems: MenuItem[] = [
         label: '资源列表',
         permission: MENU_PERMISSIONS.accesses,
       },
+      {
+        key: '/admin/system/settings',
+        label: '网站设置',
+        icon: <SettingOutlined />,
+        permission: MENU_PERMISSIONS.settings,
+      },
     ],
   },
   {

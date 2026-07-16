@@ -3,6 +3,7 @@ export const MENU_PERMISSIONS = {
   users: 'user:list',
   roles: 'role:list',
   accesses: 'access:list',
+  settings: 'setting:list',
   articles: 'article:list',
   categories: 'category:list',
   tags: 'tag:list',
@@ -13,6 +14,7 @@ const ROUTE_PERMISSIONS = {
   '/admin/system/users': MENU_PERMISSIONS.users,
   '/admin/system/roles': MENU_PERMISSIONS.roles,
   '/admin/system/accesses': MENU_PERMISSIONS.accesses,
+  '/admin/system/settings': MENU_PERMISSIONS.settings,
   '/admin/content/articles': MENU_PERMISSIONS.articles,
   '/admin/content/categories': MENU_PERMISSIONS.categories,
   '/admin/content/tags': MENU_PERMISSIONS.tags,
@@ -39,6 +41,12 @@ export const BUTTON_PERMISSIONS = {
     view: 'access:view',
     edit: 'access:edit',
     delete: 'access:delete',
+  },
+  setting: {
+    list: 'setting:list',
+    view: 'setting:view',
+    edit: 'setting:edit',
+    delete: 'setting:delete',
   },
   article: {
     list: 'article:list',

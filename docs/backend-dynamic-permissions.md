@@ -10,6 +10,7 @@
 - `/admin/system/users`
 - `/admin/system/roles`
 - `/admin/system/accesses`
+- `/admin/system/settings`
 - `/admin/content/articles`
 - `/admin/content/categories`
 - `/admin/content/tags`
@@ -20,6 +21,7 @@
 - 用户列表：`user:list`
 - 角色列表：`role:list`
 - 资源列表：`access:list`
+- 网站设置：`setting:list`
 - 文章管理：`article:list`
 - 分类管理：`category:list`
 - 标签管理：`tag:list`
@@ -29,6 +31,7 @@
 - 用户：`user:list`、`user:create`、`user:view`、`user:edit`、`user:delete`
 - 角色：`role:list`、`role:create`、`role:view`、`role:edit`、`role:delete`
 - 资源：`access:list`、`access:create`、`access:view`、`access:edit`、`access:delete`
+- 网站设置：`setting:list`、`setting:view`、`setting:edit`、`setting:delete`
 - 文章：`article:list`、`article:review:list`、`article:create`、`article:view`、`article:edit`、`article:delete`、`article:submit`、`article:withdraw`、`article:approve`、`article:status`
 - 分类：`category:list`、`category:create`、`category:view`、`category:edit`、`category:delete`
 - 标签：`tag:list`、`tag:create`、`tag:view`、`tag:edit`、`tag:delete`

@@ -30,4 +30,9 @@ export const queryKeys = {
     list: (query: unknown) => ['tags', 'list', query] as const,
     detail: (id: number) => ['tags', 'detail', id] as const,
   },
+  settings: {
+    all: ['settings'] as const,
+    detail: (key: string) => ['settings', 'detail', key] as const,
+    public: ['settings', 'public'] as const,
+  },
 }
