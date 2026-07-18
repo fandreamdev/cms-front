@@ -4,6 +4,7 @@ export const MENU_PERMISSIONS = {
   roles: 'role:list',
   accesses: 'access:list',
   settings: 'setting:list',
+  systemStatus: 'system:monitor',
   articles: 'article:list',
   categories: 'category:list',
   tags: 'tag:list',
@@ -15,12 +16,16 @@ const ROUTE_PERMISSIONS = {
   '/admin/system/roles': MENU_PERMISSIONS.roles,
   '/admin/system/accesses': MENU_PERMISSIONS.accesses,
   '/admin/system/settings': MENU_PERMISSIONS.settings,
+  '/admin/system/status': MENU_PERMISSIONS.systemStatus,
   '/admin/content/articles': MENU_PERMISSIONS.articles,
   '/admin/content/categories': MENU_PERMISSIONS.categories,
   '/admin/content/tags': MENU_PERMISSIONS.tags,
 } as const
 
 export const BUTTON_PERMISSIONS = {
+  system: {
+    monitor: 'system:monitor',
+  },
   user: {
     list: 'user:list',
     create: 'user:create',

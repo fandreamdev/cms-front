@@ -21,6 +21,10 @@ export interface RoleQuery {
   name?: string
   page?: number
   pageSize?: number
+  orderBy?: 'updatedAt'
+  order?: 'asc' | 'desc'
+  createdFrom?: string
+  createdTo?: string
 }
 
 export interface RolePayload {

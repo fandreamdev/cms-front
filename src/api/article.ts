@@ -43,6 +43,10 @@ export interface ArticleQuery {
   approvalStatus?: ArticleApprovalStatus
   page?: number
   pageSize?: number
+  orderBy?: 'updatedAt'
+  order?: 'asc' | 'desc'
+  createdFrom?: string
+  createdTo?: string
 }
 
 export interface ArticlePayload {

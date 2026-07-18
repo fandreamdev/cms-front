@@ -16,6 +16,10 @@ export interface TagQuery {
   sort?: number
   page?: number
   pageSize?: number
+  orderBy?: 'updatedAt'
+  order?: 'asc' | 'desc'
+  createdFrom?: string
+  createdTo?: string
 }
 
 export interface TagPayload {

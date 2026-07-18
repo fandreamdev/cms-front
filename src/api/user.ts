@@ -29,6 +29,10 @@ export interface UserQuery {
   isSuper?: number | ''
   page?: number
   pageSize?: number
+  orderBy?: 'updatedAt'
+  order?: 'asc' | 'desc'
+  createdFrom?: string
+  createdTo?: string
 }
 
 // 新增 / 编辑提交的字段

@@ -35,4 +35,8 @@ export const queryKeys = {
     detail: (key: string) => ['settings', 'detail', key] as const,
     public: ['settings', 'public'] as const,
   },
+  dashboard: {
+    weather: ['dashboard', 'weather'] as const,
+    system: ['dashboard', 'system'] as const,
+  },
 }

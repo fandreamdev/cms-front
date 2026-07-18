@@ -22,6 +22,7 @@ import { Route as AdminContentIndexRouteImport } from './routes/admin/content/in
 import { Route as AdminReviewsArticlesRouteRouteImport } from './routes/admin/reviews/articles/route'
 import { Route as AdminContentArticlesRouteRouteImport } from './routes/admin/content/articles/route'
 import { Route as AdminSystemUsersIndexRouteImport } from './routes/admin/system/users/index'
+import { Route as AdminSystemStatusIndexRouteImport } from './routes/admin/system/status/index'
 import { Route as AdminSystemSettingsIndexRouteImport } from './routes/admin/system/settings/index'
 import { Route as AdminSystemRolesIndexRouteImport } from './routes/admin/system/roles/index'
 import { Route as AdminSystemAccessesIndexRouteImport } from './routes/admin/system/accesses/index'
@@ -100,6 +101,11 @@ const AdminContentArticlesRouteRoute =
 const AdminSystemUsersIndexRoute = AdminSystemUsersIndexRouteImport.update({
   id: '/users/',
   path: '/users/',
+  getParentRoute: () => AdminSystemRouteRoute,
+} as any)
+const AdminSystemStatusIndexRoute = AdminSystemStatusIndexRouteImport.update({
+  id: '/status/',
+  path: '/status/',
   getParentRoute: () => AdminSystemRouteRoute,
 } as any)
 const AdminSystemSettingsIndexRoute =
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/admin/system/accesses/': typeof AdminSystemAccessesIndexRoute
   '/admin/system/roles/': typeof AdminSystemRolesIndexRoute
   '/admin/system/settings/': typeof AdminSystemSettingsIndexRoute
+  '/admin/system/status/': typeof AdminSystemStatusIndexRoute
   '/admin/system/users/': typeof AdminSystemUsersIndexRoute
   '/admin/content/articles/$id/edit': typeof AdminContentArticlesIdEditRoute
   '/admin/content/articles/$id/': typeof AdminContentArticlesIdIndexRoute
@@ -214,6 +221,7 @@ export interface FileRoutesByTo {
   '/admin/system/accesses': typeof AdminSystemAccessesIndexRoute
   '/admin/system/roles': typeof AdminSystemRolesIndexRoute
   '/admin/system/settings': typeof AdminSystemSettingsIndexRoute
+  '/admin/system/status': typeof AdminSystemStatusIndexRoute
   '/admin/system/users': typeof AdminSystemUsersIndexRoute
   '/admin/content/articles/$id/edit': typeof AdminContentArticlesIdEditRoute
   '/admin/content/articles/$id': typeof AdminContentArticlesIdIndexRoute
@@ -242,6 +250,7 @@ export interface FileRoutesById {
   '/admin/system/accesses/': typeof AdminSystemAccessesIndexRoute
   '/admin/system/roles/': typeof AdminSystemRolesIndexRoute
   '/admin/system/settings/': typeof AdminSystemSettingsIndexRoute
+  '/admin/system/status/': typeof AdminSystemStatusIndexRoute
   '/admin/system/users/': typeof AdminSystemUsersIndexRoute
   '/admin/content/articles/$id/edit': typeof AdminContentArticlesIdEditRoute
   '/admin/content/articles/$id/': typeof AdminContentArticlesIdIndexRoute
@@ -271,6 +280,7 @@ export interface FileRouteTypes {
     | '/admin/system/accesses/'
     | '/admin/system/roles/'
     | '/admin/system/settings/'
+    | '/admin/system/status/'
     | '/admin/system/users/'
     | '/admin/content/articles/$id/edit'
     | '/admin/content/articles/$id/'
@@ -291,6 +301,7 @@ export interface FileRouteTypes {
     | '/admin/system/accesses'
     | '/admin/system/roles'
     | '/admin/system/settings'
+    | '/admin/system/status'
     | '/admin/system/users'
     | '/admin/content/articles/$id/edit'
     | '/admin/content/articles/$id'
@@ -318,6 +329,7 @@ export interface FileRouteTypes {
     | '/admin/system/accesses/'
     | '/admin/system/roles/'
     | '/admin/system/settings/'
+    | '/admin/system/status/'
     | '/admin/system/users/'
     | '/admin/content/articles/$id/edit'
     | '/admin/content/articles/$id/'
@@ -421,6 +433,13 @@ declare module '@tanstack/react-router' {
       path: '/users'
       fullPath: '/admin/system/users/'
       preLoaderRoute: typeof AdminSystemUsersIndexRouteImport
+      parentRoute: typeof AdminSystemRouteRoute
+    }
+    '/admin/system/status/': {
+      id: '/admin/system/status/'
+      path: '/status'
+      fullPath: '/admin/system/status/'
+      preLoaderRoute: typeof AdminSystemStatusIndexRouteImport
       parentRoute: typeof AdminSystemRouteRoute
     }
     '/admin/system/settings/': {
@@ -596,6 +615,7 @@ interface AdminSystemRouteRouteChildren {
   AdminSystemAccessesIndexRoute: typeof AdminSystemAccessesIndexRoute
   AdminSystemRolesIndexRoute: typeof AdminSystemRolesIndexRoute
   AdminSystemSettingsIndexRoute: typeof AdminSystemSettingsIndexRoute
+  AdminSystemStatusIndexRoute: typeof AdminSystemStatusIndexRoute
   AdminSystemUsersIndexRoute: typeof AdminSystemUsersIndexRoute
 }
 
@@ -604,6 +624,7 @@ const AdminSystemRouteRouteChildren: AdminSystemRouteRouteChildren = {
   AdminSystemAccessesIndexRoute: AdminSystemAccessesIndexRoute,
   AdminSystemRolesIndexRoute: AdminSystemRolesIndexRoute,
   AdminSystemSettingsIndexRoute: AdminSystemSettingsIndexRoute,
+  AdminSystemStatusIndexRoute: AdminSystemStatusIndexRoute,
   AdminSystemUsersIndexRoute: AdminSystemUsersIndexRoute,
 }
 

@@ -5,6 +5,7 @@ import {
   FolderOutlined,
   HomeOutlined,
   SettingOutlined,
+  DashboardOutlined,
   TagsOutlined,
 } from '@ant-design/icons'
 import { MENU_PERMISSIONS } from './permissions'
@@ -30,6 +31,12 @@ export const menuItems: MenuItem[] = [
     icon: <AuditOutlined />,
     label: '审批管理',
     children: [
+      {
+        key: '/admin/system/status',
+        label: '系统状态',
+        icon: <DashboardOutlined />,
+        permission: MENU_PERMISSIONS.systemStatus,
+      },
       {
         key: '/admin/reviews/articles',
         label: '文章审批',
