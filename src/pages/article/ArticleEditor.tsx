@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ArrowLeftOutlined, SaveOutlined } from '@ant-design/icons'
-import { Button, Card, Form, Space, Spin, Upload, message } from 'antd'
+import { Button, Card, Form, Space, Spin, Upload, message, theme } from 'antd'
 import type { UploadProps } from 'antd'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { createArticle, getArticle, updateArticle, type ArticlePayload } from '../../api/article'
@@ -15,6 +15,9 @@ import ArticleEditorForm from './ArticleEditorForm'
 import { getArticleCapabilities } from './articlePolicy'
 
 const ArticleEditorPage = () => {
+  const {
+    token: { colorBgContainer, boxShadowSecondary },
+  } = theme.useToken()
   const { id } = useParams({ strict: false }) as { id?: string }
   const articleId = id ? Number(id) : null
   const editing = articleId !== null
@@ -129,8 +132,8 @@ const ArticleEditorPage = () => {
             position: 'sticky',
             top: 0,
             zIndex: 10,
-            background: '#fff',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+            background: colorBgContainer,
+            boxShadow: boxShadowSecondary,
           },
         }}
         extra={

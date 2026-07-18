@@ -6,7 +6,7 @@ import {
   FilePdfOutlined,
   FileWordOutlined,
 } from '@ant-design/icons'
-import { Button, Card, Descriptions, message, Space, Spin, Tag, Typography } from 'antd'
+import { Button, Card, Descriptions, message, Space, Spin, Tag, Typography, theme } from 'antd'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import {
   exportArticle,
@@ -28,6 +28,9 @@ interface ArticleDetailPageProps {
 }
 
 const ArticleDetailPage = ({ reviewMode = false }: ArticleDetailPageProps) => {
+  const {
+    token: { colorFillAlter },
+  } = theme.useToken()
   const { id } = useParams({ strict: false }) as { id?: string }
   const articleId = Number(id)
   const navigate = useNavigate()
@@ -145,7 +148,7 @@ const ArticleDetailPage = ({ reviewMode = false }: ArticleDetailPageProps) => {
             {article.summary && (
               <Typography.Paragraph
                 type="secondary"
-                style={{ fontSize: 16, padding: 16, background: '#fafafa', borderRadius: 8 }}
+                style={{ fontSize: 16, padding: 16, background: colorFillAlter, borderRadius: 8 }}
               >
                 {article.summary}
               </Typography.Paragraph>
