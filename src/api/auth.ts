@@ -15,6 +15,8 @@ export interface CurrentUser {
 export interface LoginPayload {
   username: string
   password: string
+  captchaId: string
+  captcha: string
 }
 
 export interface LoginResult {
@@ -23,8 +25,17 @@ export interface LoginResult {
   user: CurrentUser
 }
 
+export interface LoginCaptcha {
+  /** 服务端返回的验证码唯一标识，提交登录时原样带回。 */
+  captchaId: string
+  /** 可直接赋给 img src 的 data URL，例如 data:image/png;base64,... */
+  image: string
+}
+
 export const login = (data: LoginPayload) =>
   request<LoginResult>('/auth/login', { method: 'POST', body: data, skipAuth: true })
+
+export const getLoginCaptcha = () => request<LoginCaptcha>('/auth/captcha', { skipAuth: true })
 
 export const getCurrentUser = () => request<CurrentUser>('/auth/me')
 
